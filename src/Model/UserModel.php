@@ -21,24 +21,23 @@
 
         protected function generateSafeFields(): array
         {
-            return [
+            return array(
                 "user.id",
                 "user.username",
                 "user.first_name",
                 "user.email",
                 "user.surname",
                 "user.date_joined",
-                "user.password",
                 "user.last_login",
                 "user.is_active",
                 "user.profile_picture"
-            ];
+            );
 
         }
 
         protected function generateFields(): array
         {
-            $array = $this->generateSafeFields();
+            $array = json_decode(json_encode($this->generateSafeFields()));
             $array[] = "user.password";
             return $array;
         }

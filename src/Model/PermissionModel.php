@@ -3,11 +3,15 @@
     namespace Models;
     require_once PROJECT_ROOT_PATH . 'Model/Database.php';
 
+    use Auth\Exceptions\NotAuthorizedException;
+    use Auth\Exceptions\NotLoggedInException;
     use Auth\Exceptions\PermissionDoesNotExistException;
     use Auth\Exceptions\PermissionAlreadyExistException;
+    use Auth\Exceptions\UserDoesNotExistException;
     use Database\Exceptions\DatabaseError;
 
     // use Managers\UserManager;
+    use Managers\UserManager;
     use function password_hash;
     use const PASSWORD_BCRYPT;
 
@@ -84,7 +88,7 @@
         public function verifyName(string $name): bool
         {
             //verify if the name is empty
-            if ($name=="") {
+            if ($name == "") {
                 return false;
             }
             // count the number of users who do already have that specified name
@@ -102,10 +106,10 @@
          *
          *
          * @param string $name The name of the permission to create
-         * @param string|null $description The description of the permission to create
+         * @param string $description The description of the permission to create
          * @return int the id of the new permission
-         * @throws PermissionAlreadyExistException
          * @throws DatabaseError
+         * @throws PermissionAlreadyExistException
          */
         public function createPermission(string $name, string $description): int
         {
@@ -130,10 +134,11 @@
          * @throws PermissionAlreadyExistException If the username is already in use
          * @throws PermissionDoesNotExistException If the user does not exist
          * @throws DatabaseError
+         * @throws UserDoesNotExistException
          */
         public function updatePermission(int    $permissionId,
-                                   string $name = null,
-                                   string $description = null): int
+                                         string $name = null,
+                                         string $description = null): int
         {
             // check if the permission already exists
             if (!$this->verifyName($name)) {
@@ -150,8 +155,6 @@
             }
             return $userId;
         }
-
-
 
 
         /**
@@ -178,8 +181,6 @@
             }
             return $userId;
         }
-
-
 
 
     }

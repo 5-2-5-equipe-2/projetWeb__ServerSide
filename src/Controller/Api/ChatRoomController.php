@@ -49,7 +49,7 @@
             }
         }
 
-        public function getByIdAction()
+        public function getAction()
         {
             $strErrorDesc = '';
             $responseData = array();

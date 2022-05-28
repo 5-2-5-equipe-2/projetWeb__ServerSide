@@ -29,8 +29,8 @@
             } catch (DatabaseError $e) {
                 throw new DatabaseError($e->getMessage());
             }
-            $this->FIELDS = $this->generateSafeFields();
-            $this->FIELDS_SAFE = $this->generateFields();
+            $this->FIELDS = $this->generateFields();
+            $this->FIELDS_SAFE = $this->generateSafeFields();
 
         }
 

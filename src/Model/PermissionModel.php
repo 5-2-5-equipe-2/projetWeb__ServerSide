@@ -107,7 +107,7 @@
          * @throws PermissionAlreadyExistException
          * @throws DatabaseError
          */
-        public function createPermission(string $name, string $description): int
+        public function createPermission(string $name, string $description=null): int
         {
             // check if the permission already exists
             if (!$this->verifyName($name)) {

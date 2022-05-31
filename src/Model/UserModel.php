@@ -33,7 +33,6 @@
                 "user.is_active",
                 "user.profile_picture"
             ];
-
         }
 
         protected function generateFields(): array

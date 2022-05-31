@@ -3,6 +3,7 @@
     namespace Models;
     require_once PROJECT_ROOT_PATH . 'Model/Database.php';
 
+    use Auth\Exceptions\MessageDoesNotExistException;
     use Auth\Exceptions\NotAuthorizedException;
     use Database\Exceptions\DatabaseError;
     use DateTime;
@@ -58,13 +59,18 @@
          */
         public function getMessageById(int $id): array
         {
-            return $this->select("SELECT 
+            $data = $this->select("SELECT 
                                             {$this->getSafeFields()}
                                         FROM 
                                             message 
                                         WHERE 
                                             id = ?",
                 ["i", $id]);
+            if ($data) {
+                return $data[0];
+            } else {
+                throw new MessageDoesNotExistException();
+            }
         }
 
         /**

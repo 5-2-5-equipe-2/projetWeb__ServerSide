@@ -81,7 +81,8 @@
             self::sendData($strErrorDesc, $strErrorHeader, $responseData);
         }
 
-        public  function searchAction(){
+        public function searchAction()
+        {
             $strErrorDesc = '';
             $responseData = array();
             $strErrorHeader = '';
@@ -329,6 +330,37 @@
                     $strErrorDesc = $e->getMessage() . 'Something went wrong! Please contact support.';
                     $strErrorHeader = 'HTTP/1.1 500 Internal Server Error';
 
+                }
+            } else {
+                $strErrorDesc = 'Method not supported';
+                $strErrorHeader = 'HTTP/1.1 422 Unprocessable Entity';
+            }
+
+            // send output
+            self::sendData($strErrorDesc, $strErrorHeader, $responseData);
+        }
+
+        /**
+         * Get the currently logged user
+         *
+         */
+        public function getCurrentlyLoggedInUserAction()
+        {
+            $strErrorDesc = '';
+            $responseData = array();
+            $strErrorHeader = '';
+            $requestMethod = $_SERVER["REQUEST_METHOD"];
+
+            if (strtoupper($requestMethod) == 'GET') {
+                try {
+                    $userManager = new UserManager();
+                    $userModel = new UserModel();
+                    $userId = $userManager->getLoggedInUserId();
+                    $userData = $userModel->getUserById($userId);
+                    $responseData = json_encode($userData);
+
+                } catch (Exception $e) {
+                    self::treatBasicExceptions($e);
                 }
             } else {
                 $strErrorDesc = 'Method not supported';

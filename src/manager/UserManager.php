@@ -116,7 +116,7 @@
                 unset($_SESSION[self::SESSION_FIELD_USERNAME]);
                 unset($_SESSION[self::SESSION_FIELD_LAST_RESYNC]);
             } else {
-                throw new NotLoggedInException();
+                throw new NotLoggedInException("User not logged in");
             }
 
         }

@@ -41,11 +41,11 @@
             );
         }
 
-        public function getGameList() : array
+        public function getGameList(int $difficulty = 0, int $times = 0) : array
         {
             $resp = $this->select("SELECT *
                                         FROM 
-                                            games_list");
+                                            games_list WHERE difficulty >= ? AND times >= ?",['ii',$difficulty, $times]);
             return $resp;
         }
 
@@ -56,7 +56,7 @@
          * @throws Exception If the game doesn't exist
          */
 
-        public function getGameForPlayer(int $id) : array
+        public function getGameForPlayer(int $id, int $difficulty = 0, int $times = 0) : array
         {
             $resp = $this->select("SELECT next_time_game
                                         FROM 
@@ -66,7 +66,7 @@
             if($resp["next_time_game"] == NULL)
             {
                 $this->update("UPDATE user SET next_time_game = NOW() WHERE id = ?",["i",$id]);
-                $resp2 = $this->getGameList();
+                $resp2 = $this->getGameList(difficulty: $difficulty, times: $times);
                 $n = rand(0, count($resp2) - 1);
                 $soluce = $this->select("SELECT * FROM games_soluce WHERE game_code = ?",["i",$resp2[$n]["code"]]);
                 $m = rand(0, count($soluce) - 1);
@@ -85,7 +85,7 @@
                 else
                 {
                     $this->update("UPDATE user SET next_time_game = NOW() WHERE id = ?",["i",$id]);
-                    $resp2 = $this->getGameList();
+                    $resp2 = $this->getGameList(difficulty: $difficulty, times: $times);
                     $n = rand(0, count($resp2) - 1);
                     $soluce = $this->select("SELECT * FROM games_soluce WHERE game_code = ?",["i",$resp2[$n]["code"]]);
                     $m = rand(0, count($soluce) - 1);

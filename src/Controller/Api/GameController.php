@@ -22,7 +22,9 @@
             try {
                 $this->isRequestMethodOrThrow('GET');
                 $gameModel = new GameModel();
-                $game_selected = $gameModel->getGameForPlayer($arrQueryStringParams['user_id']);
+                isset($arrQueryStringParams['difficulty']) ? $difficulty = $arrQueryStringParams['difficulty'] : $difficulty = 0;
+                isset($arrQueryStringParams['times']) ? $times = $arrQueryStringParams['times'] : $times = 0;
+                $game_selected = $gameModel->getGameForPlayer($arrQueryStringParams['user_id'], $difficulty, $times);
                 $responseData = json_encode($game_selected);
             } catch (Exception $e) {
                 self::treatBasicExceptions($e);
@@ -40,11 +42,14 @@
             $strErrorDesc = '';
             $responseData = array();
             $strErrorHeader = '';
+            $arrQueryStringParams = $this->getGETData();
 
             try {
                 $this->isRequestMethodOrThrow('GET');
                 $gameModel = new GameModel();
-                $game_selected = $gameModel->getGameList();
+                isset($arrQueryStringParams['difficulty']) ? $difficulty = $arrQueryStringParams['difficulty'] : $difficulty = 0;
+                isset($arrQueryStringParams['times']) ? $times = $arrQueryStringParams['times'] : $times = 0;
+                $game_selected = $gameModel->getGameList($difficulty,$times);
                 $responseData = json_encode($game_selected);
 
             } catch (Exception $e) {

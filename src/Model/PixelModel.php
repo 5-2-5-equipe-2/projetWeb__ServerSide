@@ -19,7 +19,7 @@
                 "pixel.color_id",
                 "pixel.user_id",
                 "pixel.last_updated",
-                "pixel.number_of_time_placed"
+                "pixel.number_of_times_placed"
             ];
         }
 
@@ -37,7 +37,7 @@
                 "pixel.color_id" => "i",
                 "pixel.user_id" => "i",
                 "pixel.last_updated" => "s",
-                "pixel.number_of_time_placed" => "i"
+                "pixel.number_of_times_placed" => "i"
             );
         }
 

@@ -216,7 +216,7 @@ abstract class Database
         $query = "SELECT {$this->getSafeFields()} FROM {$this->TABLE} WHERE ";
         $arr = [""];
         foreach ($parameters as $key => $value) {
-            if (in_array("user." . $key, $this->generateSafeFields())) {
+            if (in_array($this->getTable() . "." . $key, $this->generateSafeFields())) {
                 $arr[] = $value;
                 $arr[0] .= $this->getTypes()[$this->getTable() . "." . $key];
                 $query .= $key . " = ? AND ";

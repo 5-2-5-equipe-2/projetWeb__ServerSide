@@ -24,6 +24,7 @@
         {
             return $this->generateSafeFields();
         }
+        
 
         public function getGameForPlayer(int $id) : array
         {

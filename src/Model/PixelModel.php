@@ -151,5 +151,17 @@
                                                  number_of_times_placed) 
                                             VALUES (?, ?, ?, ?, NOW(), 1)", ["iiii", $x, $y, $color_id, $user_id]);
         }
+
+        public function changeUserId(int $pixelId): int
+        {
+            return $this->update("UPDATE pixel SET user_id = null WHERE id = ?", ["i", $pixelId]);
+        }
+
+        public function getPixelsByUserId(int $userId): array
+        {
+            return $this->select("SELECT * FROM pixel WHERE user_id = ?", ["i", $userId]);
+        }
+
+
     }
 

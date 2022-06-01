@@ -30,6 +30,16 @@
             return $this->generateSafeFields();
         }
 
+        protected function generateTypes(): array
+        {
+            return array(
+                "message.id" => "i",
+                "message.user_id" => "i",
+                "message.chat_room_id" => "i",
+                "message.content" => "s",
+                "message.sent_date" => "s"
+            );
+        }
 
         /**
          * Get all messages

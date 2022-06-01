@@ -26,6 +26,18 @@
             return $this->generateSafeFields();
         }
 
+        protected function generateTypes(): array
+        {
+            return array(
+                "chat_room.id" => "i",
+                "chat_room.name" => "s",
+                "chat_room.description" => "s",
+                "chat_room.is_private" => "i",
+                "chat_room.created_at" => "s",
+                "chat_room.owner_id" => "i",
+            );
+        }
+
         /**
          * Get all chat rooms
          *

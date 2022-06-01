@@ -9,7 +9,6 @@
     use Auth\Exceptions\UserAlreadyExistException;
     use Auth\Exceptions\UserDoesNotExistException;
     use Auth\Exceptions\NotAuthorizedException;
-    use Auth\Exceptions\AttributeDoesNotExistException;
     use Database\Exceptions\DatabaseError;
 
     use Managers\UserManager;
@@ -20,18 +19,6 @@
     {
         protected const TABLE = "user";
 
-        // `id`              integer PRIMARY KEY AUTO_INCREMENT,
-        // `username`        varchar(150) UNIQUE NOT NULL,
-        // `first_name`      varchar(150),
-        // `email`           varchar(300) UNIQUE,
-        // `surname`         varchar(150),
-        // `password`        char(128)           NOT NULL,
-        // `date_joined`     datetime,
-        // `last_login`      datetime,
-        // `is_super_user`   boolean,
-        // `profile_picture` varchar(500),
-        // `pixels_placed`   int,
-        // `next_time_pixel` datetime
 
         protected function generateSafeFields(): array
         {
@@ -111,45 +98,6 @@
                                         WHERE 
                                             id = ?",
                 ["i", $id]);
-            if ($data) {
-                return $data[0];
-            } else {
-                throw new UserDoesNotExistException();
-            }
-        }
-
-
-        /**
-         * Get a user 
-         * @return array The user details
-         * @throws AttributeDoesNotExistException If an attribute doesn't exist
-         * @throws DatabaseError
-         * 
-         */
-        public function getUser(array $parameters): array
-        {
-            $query = "SELECT 
-                            {$this->getSafeFields()}
-                        FROM 
-                            user
-                        WHERE 
-                            ";
-            $arr=[""];
-            foreach ($parameters as $key => $value) {
-                if (in_array("user.".$key, $this->generateSafeFields())) {
-                    $arr[]=$value;
-                    if (strcmp($key,"id")==0) {
-                        $arr[0].="i";
-                    } else {
-                        $arr[0].="s";
-                    }
-                    $query .= $key . " = ? AND ";
-                } else {
-                    throw new AttributeDoesNotExistException($message="Attribute $key Does Not Exist"); // TODO 
-                }
-            }
-            $query = substr($query, 0, -5);
-            $data = $this->select($query,$arr);
             if ($data) {
                 return $data[0];
             } else {
@@ -590,7 +538,5 @@
             }
             return $data;
         }
-
-
 
     }

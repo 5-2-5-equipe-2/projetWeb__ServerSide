@@ -4,6 +4,8 @@
     namespace Models;
 
     use Database\Exceptions\DatabaseError;
+    use Auth\Exceptions\AttributeDoesNotExistException;
+    use Auth\Exceptions\ElementDoesNotExistException;
     use mysqli;
     use mysqli_stmt;
 
@@ -90,6 +92,7 @@
                 throw new DatabaseError($e->getMessage());
             }
         }
+
 
         /**
          * Inserts a new row into the database.
@@ -188,4 +191,35 @@
         {
             return $this->select("SELECT LAST_INSERT_ID()")[0]["LAST_INSERT_ID()"];
         }
+
+
+        /**
+         * Get child by anything you want
+         * @return array The returned array
+         * @throws AttributeDoesNotExistException If an attribute doesn't exist
+         * @throws DatabaseError
+         * 
+         */
+        public function getUser(array $parameters): array
+        {
+            $query = "SELECT {$this->getSafeFields()} FROM {$this->TABLE} WHERE ";
+            $arr=[""];
+            foreach ($parameters as $key => $value) {
+                if (in_array("user.".$key, $this->generateSafeFields())) {
+                    $arr[]=$value;
+                    $arr[0].=$this->getTypes()[$key];
+                    $query .= $key . " = ? AND ";
+                } else {
+                    throw new AttributeDoesNotExistException($message="Attribute $key Does Not Exist"); 
+                }
+            }
+            $query = substr($query, 0, -5);
+            $data = $this->select($query,$arr);
+            if ($data) {
+                return $data[0];
+            } else {
+                throw new ElementDoesNotExistException($message="Element Does Not Exist");
+            }
+        }
+
     }

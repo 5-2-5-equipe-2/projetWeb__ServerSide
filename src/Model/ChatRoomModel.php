@@ -6,8 +6,6 @@
 
     class ChatRoomModel extends Database
     {
-        const TABLE = "chat_room";
-
 
         protected function generateSafeFields(): array
         {
@@ -36,6 +34,11 @@
                 "chat_room.created_at" => "s",
                 "chat_room.owner_id" => "i",
             );
+        }
+
+        protected function generateTable(): string
+        {
+            return "chat_room";
         }
 
         /**

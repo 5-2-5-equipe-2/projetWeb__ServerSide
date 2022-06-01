@@ -36,6 +36,11 @@
             );
         }
 
+        protected function generateTable(): string
+        {
+            return "games_play";
+        }
+
         public function getGameList() : array
         {
             $resp = $this->select("SELECT *

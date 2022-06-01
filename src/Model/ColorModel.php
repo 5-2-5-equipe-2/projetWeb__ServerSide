@@ -30,6 +30,11 @@
             );
         }
 
+        protected function generateTable(): string
+        {
+            return "color";
+        }
+
         /**
          * Get all colors
          *

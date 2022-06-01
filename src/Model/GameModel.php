@@ -44,8 +44,8 @@
         {
             $resp = $this->select("SELECT *
                                         FROM 
-                                            next_time_game");
-            ec
+                                            next_time_game WHERE id = ?",["i",$id]);
+            print_r($resp);
             $resp2 = $this->getGameList();
             $n = rand(0, count($resp2) - 1);
             return $resp2[$n];

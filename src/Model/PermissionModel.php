@@ -33,6 +33,14 @@
             return $this->generateSafeFields();
         }
 
+        protected function generateTypes(): array
+        {
+            return array(
+                "permission.id" => "i",
+                "permission.name" => "s",
+                "permission.description" => "s",
+            );
+        }
 
         /**
          * Get all permissions
@@ -144,7 +152,9 @@
             if (!$this->verifyName($name)) {
                 throw new PermissionAlreadyExistException();
             }
-
+            $fields=""; //TODO change it
+            $params=[]; //TODO change it
+            $userId=1; //TODO change it
 
             $fields = substr($fields, 0, -1);
             $params[0] = $params[0] . "i";

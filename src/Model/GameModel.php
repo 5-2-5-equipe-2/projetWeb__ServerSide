@@ -24,7 +24,17 @@
         {
             return $this->generateSafeFields();
         }
-        
+
+        protected function generateTypes(): array
+        {
+            return array(
+                'games_play.id' => 'i',
+                'games_play.game_code' => 'i',
+                'games_play.soluce' => 's',
+                'games_play.max_soluce_time' => 's',
+                'games_play.user_id' => 'i'
+            );
+        }
 
         public function getGameList() : array
         {
@@ -46,7 +56,7 @@
             $resp = $this->select("SELECT *
                                         FROM 
                                             next_time_game");
-            ec
+            
             $resp2 = $this->getGameList();
             $n = rand(0, count($resp2) - 1);
             return $resp2[$n];

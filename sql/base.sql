@@ -11,7 +11,6 @@ CREATE TABLE `user`
     `password`        char(128)           NOT NULL,
     `date_joined`     datetime,
     `last_login`      datetime,
-    `is_active`       boolean,
     `is_super_user`   boolean,
     `profile_picture` varchar(500),
     `pixels_placed`   int,

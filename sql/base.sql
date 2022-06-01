@@ -70,7 +70,7 @@ CREATE TABLE `pixel`
     `x_position`             integer,
     `y_position`             integer,
     `color_id`               int NOT NULL,
-    `user_id`                int NOT NULL,
+    `user_id`                int,
     `last_updated`           datetime,
     `number_of_times_placed` int
 );

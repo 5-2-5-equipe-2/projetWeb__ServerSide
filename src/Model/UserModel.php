@@ -9,7 +9,6 @@
     use Auth\Exceptions\UserAlreadyExistException;
     use Auth\Exceptions\UserDoesNotExistException;
     use Auth\Exceptions\NotAuthorizedException;
-    use Auth\Exceptions\AttributeDoesNotExistException;
     use Database\Exceptions\DatabaseError;
 
     use Managers\UserManager;
@@ -19,6 +18,7 @@
     class UserModel extends Database
     {
         protected const TABLE = "user";
+
 
         protected function generateSafeFields(): array
         {
@@ -30,10 +30,11 @@
                 "user.surname",
                 "user.date_joined",
                 "user.last_login",
-                "user.is_active",
-                "user.profile_picture"
+                "user.is_super_user",
+                "user.profile_picture",
+                "user.pixels_placed",
+                "user.next_time_pixel"
             );
-
         }
 
         protected function generateFields(): array
@@ -43,6 +44,22 @@
             return $array;
         }
 
+        protected function generateTypes(): array
+        {
+            return array(
+                "user.id" => "i",
+                "user.username" => "s",
+                "user.first_name" => "s",
+                "user.email" => "s",
+                "user.surname" => "s",
+                "user.date_joined" => "s",
+                "user.last_login" => "s",
+                "user.is_super_user" => "i",
+                "user.profile_picture" => "s",
+                "user.pixels_placed" => "i",
+                "user.next_time_pixel" => "s",
+            );
+        }
 
         /**
          * Get all users
@@ -81,45 +98,6 @@
                                         WHERE 
                                             id = ?",
                 ["i", $id]);
-            if ($data) {
-                return $data[0];
-            } else {
-                throw new UserDoesNotExistException();
-            }
-        }
-
-
-        /**
-         * Get a user 
-         * @return array The user details
-         * @throws AttributeDoesNotExistException If an attribute doesn't exist
-         * @throws DatabaseError
-         * 
-         */
-        public function getUser(array $parameters): array
-        {
-            $query = "SELECT 
-                            {$this->getSafeFields()}
-                        FROM 
-                            user
-                        WHERE 
-                            ";
-            $arr=[""];
-            foreach ($parameters as $key => $value) {
-                if (in_array("user.".$key, $this->generateSafeFields())) {
-                    $arr[]=$value;
-                    if (strcmp($key,"id")==0) {
-                        $arr[0].="i";
-                    } else {
-                        $arr[0].="s";
-                    }
-                    $query .= $key . " = ? AND ";
-                } else {
-                    throw new AttributeDoesNotExistException($message="Attribute $key Does Not Exist"); // TODO 
-                }
-            }
-            $query = substr($query, 0, -5);
-            $data = $this->select($query,$arr);
             if ($data) {
                 return $data[0];
             } else {
@@ -560,7 +538,5 @@
             }
             return $data;
         }
-
-
 
     }

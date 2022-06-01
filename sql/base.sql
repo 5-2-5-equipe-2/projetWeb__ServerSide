@@ -11,7 +11,6 @@ CREATE TABLE `user`
     `password`        char(128)           NOT NULL,
     `date_joined`     datetime,
     `last_login`      datetime,
-    `is_active`       boolean,
     `is_super_user`   boolean,
     `profile_picture` varchar(500),
     `pixels_placed`   int,
@@ -24,7 +23,8 @@ CREATE TABLE `chat_room`
     `name`        varchar(150) NOT NULL,
     `owner_id`    integer      NOT NULL,
     `created_at`  datetime     NOT NULL,
-    `description` text
+    `description` text,
+    `is_private`   boolean
 );
 
 CREATE TABLE `moderator`

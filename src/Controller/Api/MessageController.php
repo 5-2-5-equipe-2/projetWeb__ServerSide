@@ -103,14 +103,9 @@
 
             if (strtoupper($requestMethod) == 'POST') {
                 try {
-                    if (isset($arrQueryStringParams['userId']) && $arrQueryStringParams['userId']) {
-                        $userId = $arrQueryStringParams['userId'];
-                    }
-                    else{
-                        throw new \InvalidArgumentException('User id is required');
-                    }
+                    $queryArgs = $this->getRequiredGetArgsOrThrow(array('content','userId','chatRoomId'), array('string','number','number'));
                     $messageModel = new MessageModel();
-                    $arrMessage = $messageModel->createMessage($arrQueryStringParams);
+                    $arrMessage = $messageModel->createMessage($queryArgs['content'], $queryArgs['userId'], $queryArgs['chatRoomId']);
                     $responseData = json_encode($arrMessage);
                 } catch (Exception $e) {
                     self::treatBasicExceptions($e);

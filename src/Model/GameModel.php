@@ -3,11 +3,16 @@
     namespace Models;
     require_once PROJECT_ROOT_PATH . 'Model/Database.php';
 
-    use Auth\Exceptions\PixelAlreadyExistException;
+    use Auth\Exceptions\GameAlreadyPlayException;
+    use Auth\Exceptions\NoGamePlayableException;
+    use Auth\Exceptions\WrongSoluceGameException;
+    use Auth\Exceptions\TimeoutSoluceGameException;
     use Database\Exceptions\DatabaseError;
     use Exception;
 
     class GameModel extends Database {
+
+        const TIME_BETWEEN_GAME = 0; // 5 minutes
 
         protected function generateSafeFields(): array
         {
@@ -41,11 +46,11 @@
             return "games_play";
         }
 
-        public function getGameList() : array
+        public function getGameList(int $difficulty = 0, int $times = 0) : array
         {
             $resp = $this->select("SELECT *
                                         FROM 
-                                            games_list");
+                                            games_list WHERE difficulty >= ? AND times >= ?",['ii',$difficulty, $times]);
             return $resp;
         }
 
@@ -56,20 +61,74 @@
          * @throws Exception If the game doesn't exist
          */
 
-        public function getGameForPlayer(int $id) : array
+        public function getGameForPlayer(int $id, int $difficulty = 0, int $times = 0) : array
         {
-            $resp = $this->select("SELECT *
+            $resp = $this->select("SELECT next_time_game
                                         FROM 
-                                            next_time_game");
-            
-            $resp2 = $this->getGameList();
-            $n = rand(0, count($resp2) - 1);
-            return $resp2[$n];
+                                             user WHERE id = ?",["i",$id]);
+            $now = new \DateTime();
+            $resp=$resp[0];
+            if($resp["next_time_game"] == NULL)
+            {
+                $this->update("UPDATE user SET next_time_game = NOW() WHERE id = ?",["i",$id]);
+                $resp2 = $this->getGameList(difficulty: $difficulty, times: $times);
+                $n = rand(0, count($resp2) - 1);
+                $soluce = $this->select("SELECT * FROM games_soluce WHERE game_code = ?",["i",$resp2[$n]["code"]]);
+                $m = rand(0, count($soluce) - 1);
+                $now->setTimestamp($now->getTimestamp()+$resp2[$n]["times"]);
+                $this->insert("INSERT INTO games_play (game_code, soluce, max_soluce_time, user_id) VALUES (?, ?, ?, ?)",
+                        ["issi",$resp2[$n]["code"], $soluce[$m]["soluce"], $now->format('Y-m-d H:i:s'),$id]);
+                return $resp2[$n];
+            }
+            else
+            {
+                $delta = $now->getTimestamp()-strtotime($resp["next_time_game"]);
+                if($delta < self::TIME_BETWEEN_GAME)
+                {
+                    throw new GameAlreadyPlayException();
+                }
+                else
+                {
+                    $this->update("UPDATE user SET next_time_game = NOW() WHERE id = ?",["i",$id]);
+                    $resp2 = $this->getGameList(difficulty: $difficulty, times: $times);
+                    $n = rand(0, count($resp2) - 1);
+                    $soluce = $this->select("SELECT * FROM games_soluce WHERE game_code = ?",["i",$resp2[$n]["code"]]);
+                    $m = rand(0, count($soluce) - 1);
+                    $now->setTimestamp($now->getTimestamp()+$resp2[$n]["times"]);
+                    $this->insert("INSERT INTO games_play (game_code, soluce, max_soluce_time, user_id) VALUES (?, ?, ?, ?)",
+                        ["issi",$resp2[$n]["code"], $soluce[$m]["soluce"], $now->format('Y-m-d H:i:s'),$id]);
+                    return $resp2[$n];
+                }
+            }
         }
 
         public function postSoluceGame(int $id, string $soluce): array
         {
-            return array();
+            $resp = $this->select("SELECT * FROM games_play WHERE user_id = ?",["i",$id]);
+            
+            if(count($resp) == 0)
+            {
+                throw new NoGamePlayableException();
+            }
+
+            $resp=$resp[0];
+
+            $now = new \DateTime();
+            if($now->getTimestamp()>strtotime($resp["max_soluce_time"]))
+            {
+                $this->delete("DELETE FROM games_play WHERE id = ?",["i",$resp["id"]]);
+                throw new TimeoutSoluceGameException();
+            }
+
+            if($resp["soluce"] === $soluce)
+            {
+                $this->delete("DELETE FROM games_play WHERE id = ?",["i",$resp["id"]]);
+                return array("success" => true);
+            }
+            else
+            {
+                throw new WrongSoluceGameException();
+            }
         }
     }
 

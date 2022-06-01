@@ -92,7 +92,7 @@
          * @return array The pixels
          * @throws Exception
          **/
-        public function getPixelsAfterDate(int $x1, int $y1, int $x2, int $y2, string $date): array
+        public function getPixelsInRectangleAfterDate(int $x1, int $y1, int $x2, int $y2, string $date): array
         {
             return $this->select("SELECT 
                                             {$this->getSafeFields()}
@@ -104,7 +104,7 @@
                                             AND y_position >= ?
                                             AND y_position <= ?
                                             AND last_updated >= ?",
-                ["iiii", $x1, $x2, $y1, $y2, $date]);
+                ["iiiis", $x1, $x2, $y1, $y2,$date]);
         }
 
 
@@ -138,9 +138,9 @@
          * @return int the id of the deleted user
          * @throws Exception If the pixel doesn't exist
          */
-        public function deletePixel(int $msgId): int
+        public function deletePixel(int $pixelId): int
         {
-            return $this->delete("DELETE FROM pixel WHERE id = ?", ["i", $msgId]);
+            return $this->delete("DELETE FROM pixel WHERE id = ?", ["i", $pixelId]);
         }
 
         /**
@@ -171,7 +171,7 @@
                                             VALUES (?, ?, ?, ?, NOW(), 1)", ["iiii", $x, $y, $color_id, $user_id]);
         }
 
-        public function changeUserId(int $pixelId): int
+        public function makeUserIdNull(int $pixelId): int
         {
             return $this->update("UPDATE pixel SET user_id = null WHERE id = ?", ["i", $pixelId]);
         }
@@ -181,6 +181,9 @@
             return $this->select("SELECT * FROM pixel WHERE user_id = ?", ["i", $userId]);
         }
 
-
+        public function getPixels(int $limit): array
+        {
+            return $this->select("SELECT * FROM pixel ORDER BY id LIMIT =?", ["ii", $limit]);
+        }
     }
 

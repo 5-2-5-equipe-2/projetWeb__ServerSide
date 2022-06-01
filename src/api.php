@@ -4,6 +4,7 @@
     use Controllers\ChatRoomController;
     use Controllers\UserController;
     use Controllers\MessageController;
+    use Controllers\PixelController;
     use Controllers\GameController;
 
     require __DIR__ . "/inc/bootstrap.php";
@@ -40,6 +41,10 @@
                 $messageController = new MessageController();
                 $messageController->{$uri[3] . 'Action'}();
                 break;
+                case 'pixel':
+                    $messageController = new PixelController();
+                    $messageController->{$uri[3] . 'Action'}();
+                    break;
             case 'game':
                 $gameController = new GameController();
                 $gameController->{$uri[3] . 'Action'}();

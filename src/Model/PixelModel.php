@@ -27,6 +27,19 @@
             return $this->generateSafeFields();
         }
 
+        protected function generateTypes(): array
+        {
+            return array(
+                "pixel.id" => "i",
+                "x_position" => "i",
+                "y_position" => "i",
+                "color_id" => "i",
+                "user_id" => "i",
+                "last_updated" => "s",
+                "number_of_time_placed" => "i"
+            );
+        }
+
         /**
          * Get pixels in a rectangle
          * @param int $x1 The x position of the top left corner

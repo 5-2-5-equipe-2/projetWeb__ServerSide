@@ -11,7 +11,6 @@ CREATE TABLE `user`
     `password`        char(128)           NOT NULL,
     `date_joined`     datetime,
     `last_login`      datetime,
-    `is_active`       boolean,
     `is_super_user`   boolean,
     `profile_picture` varchar(500),
     `pixels_placed`   int,
@@ -24,7 +23,8 @@ CREATE TABLE `chat_room`
     `name`        varchar(150) NOT NULL,
     `owner_id`    integer      NOT NULL,
     `created_at`  datetime     NOT NULL,
-    `description` text
+    `description` text,
+    `is_private`   boolean
 );
 
 CREATE TABLE `moderator`
@@ -82,6 +82,23 @@ CREATE TABLE `color`
     `hex_code` char(7) NOT NULL
 );
 
+CREATE TABLE `games_list` (
+  `id` int(11) NOT NULL,
+  `name` varchar(255) DEFAULT NULL,
+  `explain_text` text,
+  `difficulty` int(11) DEFAULT NULL,
+  `times` int(11) DEFAULT NULL,
+  `code` int(11) DEFAULT NULL
+);
+
+CREATE TABLE `games_play` (
+  `id` int(11) NOT NULL,
+  `game_code` int(11) DEFAULT NULL,
+  `soluce` text,
+  `max_soluce_time` datetime DEFAULT NULL,
+  `user_id` int(11) DEFAULT NULL
+);
+
 ALTER TABLE `chat_room`
     ADD FOREIGN KEY (`owner_id`) REFERENCES `user` (`id`);
 
@@ -114,6 +131,20 @@ ALTER TABLE `pixel`
 
 ALTER TABLE `pixel`
     ADD FOREIGN KEY (`user_id`) REFERENCES `user` (`id`);
+
+ALTER TABLE `games_list`
+    ADD PRIMARY KEY (`id`);
+
+ALTER TABLE `games_list`
+    MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+COMMIT;
+
+ALTER TABLE `games_play`
+    ADD PRIMARY KEY (`id`);
+
+ALTER TABLE `games_play`
+    MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+COMMIT;
 
 # create debug users
 INSERT INTO user (username, password)

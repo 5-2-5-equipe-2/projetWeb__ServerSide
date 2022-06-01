@@ -4,6 +4,8 @@
     namespace Models;
 
     use Database\Exceptions\DatabaseError;
+    use Auth\Exceptions\AttributeDoesNotExistException;
+    use Auth\Exceptions\ElementDoesNotExistException;
     use mysqli;
     use mysqli_stmt;
 
@@ -13,6 +15,7 @@
         protected const TABLE = "";
         protected array $FIELDS;
         protected array $FIELDS_SAFE;
+        protected array $TYPES;
 
 
         /**
@@ -31,11 +34,12 @@
             }
             $this->FIELDS = $this->generateFields();
             $this->FIELDS_SAFE = $this->generateSafeFields();
-
+            $this->TYPES = $this->generateTypes();
         }
 
         abstract protected function generateSafeFields(): array;
         abstract protected function generateFields(): array;
+        abstract protected function generateTypes(): array;
 
 
         /**
@@ -51,13 +55,23 @@
         /**
          * Get the fields seperated by commas
          *
-         *
          * @return string
          */
         protected function getFields(): string
         {
             return implode(", ", $this->FIELDS);
         }
+
+        /**
+         * Get the types of the fields
+         *
+         * @return string
+         */
+        protected function getTypes(): array
+        {
+            return $this->FIELDS;
+        }
+
 
 
         /**
@@ -78,6 +92,7 @@
                 throw new DatabaseError($e->getMessage());
             }
         }
+
 
         /**
          * Inserts a new row into the database.
@@ -176,4 +191,35 @@
         {
             return $this->select("SELECT LAST_INSERT_ID()")[0]["LAST_INSERT_ID()"];
         }
+
+
+        /**
+         * Get child by anything you want
+         * @return array The returned array
+         * @throws AttributeDoesNotExistException If an attribute doesn't exist
+         * @throws DatabaseError
+         * 
+         */
+        public function getUser(array $parameters): array
+        {
+            $query = "SELECT {$this->getSafeFields()} FROM {$this->TABLE} WHERE ";
+            $arr=[""];
+            foreach ($parameters as $key => $value) {
+                if (in_array("user.".$key, $this->generateSafeFields())) {
+                    $arr[]=$value;
+                    $arr[0].=$this->getTypes()[$key];
+                    $query .= $key . " = ? AND ";
+                } else {
+                    throw new AttributeDoesNotExistException($message="Attribute $key Does Not Exist"); 
+                }
+            }
+            $query = substr($query, 0, -5);
+            $data = $this->select($query,$arr);
+            if ($data) {
+                return $data[0];
+            } else {
+                throw new ElementDoesNotExistException($message="Element Does Not Exist");
+            }
+        }
+
     }

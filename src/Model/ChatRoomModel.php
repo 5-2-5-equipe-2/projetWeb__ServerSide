@@ -166,7 +166,6 @@
  
             $ownerId = $chatRoom[0]["owner_id"];
             if ($ownerId == $userId) {
-                print_r(count($this->getUsers($chatRoomId)));
                 if (count($this->getUsers($chatRoomId)) == 0) {
                     $this->deleteChatRoom($chatRoomId);
                 }
@@ -185,12 +184,6 @@
                                         ", ["ii", $newOwnerId, $chatRoomId]);
         }
 
-        public function removeOwner(int $chatRoomId): bool
-        {
-            return $this->update("UPDATE chat_room
-                                        SET owner_id = NULL
-                                        WHERE id = ?
-                                        ", ["i", $chatRoomId]);
-        }
+       
 
     }

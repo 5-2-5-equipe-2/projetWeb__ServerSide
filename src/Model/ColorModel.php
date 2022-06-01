@@ -36,14 +36,15 @@
          * @return array
          * @throws DatabaseError
          */
-        public function getColors(): array
+        public function getColors($limit): array
         {
             return $this->select("SELECT 
                                             {$this->getSafeFields()}
                                         FROM 
                                             color
                                         ORDER BY 
-                                            id");
+                                            id
+                                        LIMIT $limit");
         }
 
         /**
@@ -131,7 +132,7 @@
         /**
          * @throws DatabaseError
          */
-        private function isValidColor(string $name, string $hexCode)
+        public function isValidColor(string $name, string $hexCode)
         {
             //Check if hex code is valid
             if (!preg_match('/^#[a-f0-9]{6}$/i', $hexCode)) {

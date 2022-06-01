@@ -177,7 +177,7 @@
 
         public function getPixels(int $limit): array
         {
-            return $this->select("SELECT * FROM pixel ORDER BY id LIMIT =?", ["ii", $limit]);
+            return $this->select("SELECT * FROM pixel ORDER BY id LIMIT ?", ["i", $limit]);
         }
     }
 

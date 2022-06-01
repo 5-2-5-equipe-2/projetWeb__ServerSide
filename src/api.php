@@ -6,6 +6,7 @@
     use Controllers\MessageController;
     use Controllers\PixelController;
     use Controllers\GameController;
+    use Controllers\ColorController;
 
     require __DIR__ . "/inc/bootstrap.php";
 
@@ -43,12 +44,16 @@
                 $messageController = new MessageController();
                 $messageController->{$uri[3] . 'Action'}();
                 break;
-                case 'pixel':
-                    $messageController = new PixelController();
-                    $messageController->{$uri[3] . 'Action'}();
-                    break;
+            case 'pixel':
+                $messageController = new PixelController();
+                $messageController->{$uri[3] . 'Action'}();
+                break;
             case 'game':
                 $gameController = new GameController();
+                $gameController->{$uri[3] . 'Action'}();
+                break;
+            case 'color':
+                $gameController = new ColorController();
                 $gameController->{$uri[3] . 'Action'}();
                 break;
             default:

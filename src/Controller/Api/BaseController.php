@@ -52,6 +52,19 @@
             }
         }
 
+        /**
+         * Get PUT params.
+         */
+        protected function getPUTData(): array
+        {
+            $data = file_get_contents('php://input');
+            if ($data) {
+                return json_decode($data, true);
+            } else {
+                return array();
+            }
+        }
+
 
         /**
          * Send API output.
@@ -134,11 +147,11 @@
          **/
         protected function getTypeFromString(string $data): string
         {
-            if (is_numeric($data)) return "number";
+            if (strtotime($data)) return "date";
 
             // if $data is not a valid date format strtotime() will return false
             // so we're just using it as a validator basically
-            elseif (strtotime($data)) return "date";
+            if (is_numeric($data)) return "number";
 
             return 'string';
         }
@@ -188,7 +201,29 @@
          *
          * @throws InvalidArgumentException
          */
-        protected function getRequiredPostArgsAndThrow(array $arrRequiredArgs, array $types): array
+        protected function getRequiredPostArgsOrThrow(array $arrRequiredArgs, array $types): array
+        {
+            $data = $this->getRequiredPostArgs($arrRequiredArgs, $types);
+            if (count($data[1])) {
+                throw new InvalidArgumentException(
+                    'Missing or invalid required arguments: ' . implode(', ', $data[1]), 418);
+
+            }
+            return $data[0];
+        }
+
+        protected function getRequiredPutArgs(array $arrRequiredArgs, array $types): array
+        {
+            $arrPostData = $this->getPUTData();
+            return $this->getRequiredArgs($arrRequiredArgs, $arrPostData, $types);
+        }
+
+        /**
+         * get required post args and throws errors
+         *
+         * @throws InvalidArgumentException
+         */
+        protected function getRequiredPutArgsOrThrow(array $arrRequiredArgs, array $types): array
         {
             $data = $this->getRequiredPostArgs($arrRequiredArgs, $types);
             if (count($data[1])) {

@@ -432,7 +432,7 @@
             $pix=new PixelModel();
             $myPixels=$pix->getPixelsByUserId($userId);
             foreach ($myPixels as $pixel) {
-                $pix->changeUserId($pixel['id']);
+                $pix->makeUserIdNull($pixel['id']);
             }
             
             $deleteRows = $this->delete("DELETE FROM user WHERE id = ?", ["i", $userId]);

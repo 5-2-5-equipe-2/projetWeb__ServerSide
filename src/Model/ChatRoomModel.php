@@ -123,9 +123,9 @@
          * @return array The chat room
          * @throws Exception If the chat room does not exist
          */
-        public function createChatRoom(string $chatRoomName, int $ownerId): array
+        public function createChatRoom(string $chatRoomName, int $ownerId): int
         {
-            return $this->select("INSERT INTO 
+            return $this->insert("INSERT INTO 
                                         chat_room (name, owner_id,created_at)
                                         VALUES (?, ?, NOW())
                                         ", ["si", $chatRoomName, $ownerId]);

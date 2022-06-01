@@ -4,6 +4,7 @@
     use Controllers\ChatRoomController;
     use Controllers\UserController;
     use Controllers\MessageController;
+    use Controllers\PixelController;
 
     require __DIR__ . "/inc/bootstrap.php";
 
@@ -39,6 +40,10 @@
                 $messageController = new MessageController();
                 $messageController->{$uri[3] . 'Action'}();
                 break;
+                case 'pixel':
+                    $messageController = new PixelController();
+                    $messageController->{$uri[3] . 'Action'}();
+                    break;
             default:
                 header("HTTP/1.1 404 Not Found");
                 exit();

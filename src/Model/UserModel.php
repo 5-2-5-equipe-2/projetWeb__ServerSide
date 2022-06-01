@@ -19,6 +19,19 @@
     {
         protected const TABLE = "user";
 
+        // `id`              integer PRIMARY KEY AUTO_INCREMENT,
+        // `username`        varchar(150) UNIQUE NOT NULL,
+        // `first_name`      varchar(150),
+        // `email`           varchar(300) UNIQUE,
+        // `surname`         varchar(150),
+        // `password`        char(128)           NOT NULL,
+        // `date_joined`     datetime,
+        // `last_login`      datetime,
+        // `is_super_user`   boolean,
+        // `profile_picture` varchar(500),
+        // `pixels_placed`   int,
+        // `next_time_pixel` datetime
+
         protected function generateSafeFields(): array
         {
             return array(
@@ -29,10 +42,11 @@
                 "user.surname",
                 "user.date_joined",
                 "user.last_login",
-                "user.is_active",
-                "user.profile_picture"
+                "user.is_super_user",
+                "user.profile_picture",
+                "user.pixels_placed",
+                "user.next_time_pixel"
             );
-
         }
 
         protected function generateFields(): array
@@ -42,6 +56,22 @@
             return $array;
         }
 
+        protected function generateTypes(): array
+        {
+            return array(
+                "user.id" => "i",
+                "user.username" => "s",
+                "user.first_name" => "s",
+                "user.email" => "s",
+                "user.surname" => "s",
+                "user.date_joined" => "s",
+                "user.last_login" => "s",
+                "user.is_super_user" => "i",
+                "user.profile_picture" => "s",
+                "user.pixels_placed" => "i",
+                "user.next_time_pixel" => "s",
+            );
+        }
 
         /**
          * Get all users

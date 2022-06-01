@@ -13,6 +13,7 @@
         protected const TABLE = "";
         protected array $FIELDS;
         protected array $FIELDS_SAFE;
+        protected array $TYPES;
 
 
         /**
@@ -31,11 +32,12 @@
             }
             $this->FIELDS = $this->generateFields();
             $this->FIELDS_SAFE = $this->generateSafeFields();
-
+            $this->TYPES = $this->generateTypes();
         }
 
         abstract protected function generateSafeFields(): array;
         abstract protected function generateFields(): array;
+        abstract protected function generateTypes(): array;
 
 
         /**
@@ -51,13 +53,23 @@
         /**
          * Get the fields seperated by commas
          *
-         *
          * @return string
          */
         protected function getFields(): string
         {
             return implode(", ", $this->FIELDS);
         }
+
+        /**
+         * Get the types of the fields
+         *
+         * @return string
+         */
+        protected function getTypes(): array
+        {
+            return $this->FIELDS;
+        }
+
 
 
         /**

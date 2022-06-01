@@ -69,7 +69,7 @@ CREATE TABLE `pixel`
     `x_position`             integer,
     `y_position`             integer,
     `color_id`               int NOT NULL,
-    `user_id`                int NOT NULL,
+    `user_id`                int,
     `last_updated`           datetime,
     `number_of_times_placed` int
 );
@@ -79,6 +79,23 @@ CREATE TABLE `color`
     `id`       integer PRIMARY KEY AUTO_INCREMENT,
     `name`     varchar(200),
     `hex_code` char(7) NOT NULL
+);
+
+CREATE TABLE `games_list` (
+  `id` int(11) NOT NULL,
+  `name` varchar(255) DEFAULT NULL,
+  `explain_text` text,
+  `difficulty` int(11) DEFAULT NULL,
+  `times` int(11) DEFAULT NULL,
+  `code` int(11) DEFAULT NULL
+);
+
+CREATE TABLE `games_play` (
+  `id` int(11) NOT NULL,
+  `game_code` int(11) DEFAULT NULL,
+  `soluce` text,
+  `max_soluce_time` datetime DEFAULT NULL,
+  `user_id` int(11) DEFAULT NULL
 );
 
 ALTER TABLE `chat_room`
@@ -113,6 +130,20 @@ ALTER TABLE `pixel`
 
 ALTER TABLE `pixel`
     ADD FOREIGN KEY (`user_id`) REFERENCES `user` (`id`);
+
+ALTER TABLE `games_list`
+    ADD PRIMARY KEY (`id`);
+
+ALTER TABLE `games_list`
+    MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+COMMIT;
+
+ALTER TABLE `games_play`
+    ADD PRIMARY KEY (`id`);
+
+ALTER TABLE `games_play`
+    MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+COMMIT;
 
 # create debug users
 INSERT INTO user (username, password)

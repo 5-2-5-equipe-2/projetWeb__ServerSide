@@ -9,6 +9,7 @@
     use Auth\Exceptions\UserAlreadyExistException;
     use Auth\Exceptions\UserDoesNotExistException;
     use Auth\Exceptions\NotAuthorizedException;
+    use Auth\Exceptions\AttributeDoesNotExistException;
     use Database\Exceptions\DatabaseError;
 
     use Managers\UserManager;
@@ -110,6 +111,45 @@
                                         WHERE 
                                             id = ?",
                 ["i", $id]);
+            if ($data) {
+                return $data[0];
+            } else {
+                throw new UserDoesNotExistException();
+            }
+        }
+
+
+        /**
+         * Get a user 
+         * @return array The user details
+         * @throws AttributeDoesNotExistException If an attribute doesn't exist
+         * @throws DatabaseError
+         * 
+         */
+        public function getUser(array $parameters): array
+        {
+            $query = "SELECT 
+                            {$this->getSafeFields()}
+                        FROM 
+                            user
+                        WHERE 
+                            ";
+            $arr=[""];
+            foreach ($parameters as $key => $value) {
+                if (in_array("user.".$key, $this->generateSafeFields())) {
+                    $arr[]=$value;
+                    if (strcmp($key,"id")==0) {
+                        $arr[0].="i";
+                    } else {
+                        $arr[0].="s";
+                    }
+                    $query .= $key . " = ? AND ";
+                } else {
+                    throw new AttributeDoesNotExistException($message="Attribute $key Does Not Exist"); // TODO 
+                }
+            }
+            $query = substr($query, 0, -5);
+            $data = $this->select($query,$arr);
             if ($data) {
                 return $data[0];
             } else {
@@ -323,10 +363,7 @@
                                    string $email = null,
                                    string $profilePicture = null): int
         {
-            $userManager = new UserManager();
-            if ($userManager->getLoggedInUserId() != $userId) {
-                throw new NotAuthorizedException();
-            }
+            
             $fields = "";
             $params = [""];
             if ($username !== null && $this->verifyUsername($username)) {
@@ -383,7 +420,7 @@
                 throw new NotAuthorizedException();
             }
             if ($this->validatePassword($password)) {
-                $updatedRows = $this->update("UPDATE user SET password = ? WHERE id = ?", ["ss", $password, $userId]);
+                $updatedRows = $this->update("UPDATE user SET password = ? WHERE id = ?", ["ss", password_hash($password,PASSWORD_BCRYPT), $userId]);
                 if ($updatedRows == 0) {
                     throw new UserDoesNotExistException("User with id $userId does not exist");
                 }
@@ -405,17 +442,36 @@
          */
         public function deleteUser(int $userId): int
         {
+            if (True) {
             $userManager = new UserManager();
             if ($userManager->getLoggedInUserId() != $userId) {
                 throw new NotAuthorizedException();
             }
-
+            $rid=[];
+            $chatroomm=new ChatroomModel();
+            // try{
+                $rid=$this->getChatRooms($userId);
+            // }catch(UserDoesNotExistException $e){
+            //     //do nothing
+            // }
+            foreach ($rid as $chatroom) {
+                $chatroomm->deleteUserFromChatRoom($userId,$chatroom['id']);
+            }}
+            $mess=new MessageModel();
+            $mess->deleteUserMessages($userId); 
+            $pix=new PixelModel();
+            $myPixels=$pix->getPixelsByUserId($userId);
+            foreach ($myPixels as $pixel) {
+                $pix->changeUserId($pixel['id']);
+            }
+            
             $deleteRows = $this->delete("DELETE FROM user WHERE id = ?", ["i", $userId]);
             if ($deleteRows == 0) {
                 throw new UserDoesNotExistException("User with id $userId does not exist");
             }
             return $userId;
         }
+    
 
 
         /**
@@ -450,6 +506,7 @@
             return $data;
 
         }
+
 
         /**
          * Get the messages of a user if the user is logged in and the room is in the user's rooms
@@ -514,6 +571,26 @@
 
             return $data;
         }
+
+        public function getMyChatrooms(int $userId): array
+        {
+            $userManager = new UserManager();
+            if ($userManager->getLoggedInUserId() != $userId) {
+                throw new NotAuthorizedException();
+            }
+            $data = $this->select("
+                                        SELECT 
+                                            chat_room.id,
+                                            chat_room.owner_id
+                                        FROM chat_room
+                                        WHERE chat_room.owner_id = ?
+                                        ORDER BY chat_room.id;", ["i", $userId]);
+            if ($data == null) {
+                throw new UserDoesNotExistException("User with id $userId does not exist");
+            }
+            return $data;
+        }
+
 
 
     }

@@ -162,6 +162,18 @@
         }
 
         /**
+         * check args
+         *
+         */
+        protected function checkArgs(array $arrRequiredArgs, array $arrRequestData, array $types): bool
+        {
+            $arr=$this->getRequiredArgs($arrRequiredArgs, $arrRequestData, $types);
+            return strlen($arr[1]) == 0;
+
+        }
+
+
+        /**
          * get required post args
          *
          */

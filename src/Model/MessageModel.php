@@ -179,5 +179,10 @@
             return $this->delete("DELETE FROM message WHERE id = ?", ["i", $msgId]);
         }
 
+        public function deleteUserMessages(int $userId): int
+        {
+            return $this->delete("DELETE FROM message WHERE user_id = ?", ["i", $userId]);
+        }
+
 
     }

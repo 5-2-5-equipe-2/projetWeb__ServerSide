@@ -27,6 +27,19 @@
             return $this->generateSafeFields();
         }
 
+        protected function generateTypes(): array
+        {
+            return array(
+                "pixel.id" => "i",
+                "x_position" => "i",
+                "y_position" => "i",
+                "color_id" => "i",
+                "user_id" => "i",
+                "last_updated" => "s",
+                "number_of_time_placed" => "i"
+            );
+        }
+
         /**
          * Get pixels in a rectangle
          * @param int $x1 The x position of the top left corner
@@ -151,5 +164,17 @@
                                                  number_of_times_placed) 
                                             VALUES (?, ?, ?, ?, NOW(), 1)", ["iiii", $x, $y, $color_id, $user_id]);
         }
+
+        public function changeUserId(int $pixelId): int
+        {
+            return $this->update("UPDATE pixel SET user_id = null WHERE id = ?", ["i", $pixelId]);
+        }
+
+        public function getPixelsByUserId(int $userId): array
+        {
+            return $this->select("SELECT * FROM pixel WHERE user_id = ?", ["i", $userId]);
+        }
+
+
     }
 

@@ -19,30 +19,47 @@
     {
         protected const TABLE = "user";
 
+
         protected function generateSafeFields(): array
         {
-            return [
+            return array(
                 "user.id",
                 "user.username",
                 "user.first_name",
                 "user.email",
                 "user.surname",
                 "user.date_joined",
-                "user.password",
                 "user.last_login",
-                "user.is_active",
-                "user.profile_picture"
-            ];
-
+                "user.is_super_user",
+                "user.profile_picture",
+                "user.pixels_placed",
+                "user.next_time_pixel"
+            );
         }
 
         protected function generateFields(): array
         {
-            $array = $this->generateSafeFields();
+            $array = json_decode(json_encode($this->generateSafeFields()));
             $array[] = "user.password";
             return $array;
         }
 
+        protected function generateTypes(): array
+        {
+            return array(
+                "user.id" => "i",
+                "user.username" => "s",
+                "user.first_name" => "s",
+                "user.email" => "s",
+                "user.surname" => "s",
+                "user.date_joined" => "s",
+                "user.last_login" => "s",
+                "user.is_super_user" => "i",
+                "user.profile_picture" => "s",
+                "user.pixels_placed" => "i",
+                "user.next_time_pixel" => "s",
+            );
+        }
 
         /**
          * Get all users
@@ -267,10 +284,7 @@
             // create the user
             return $this->insert("INSERT INTO user (username, password, first_name, surname, email, profile_picture) 
                                 VALUES (?, ?, ?, ?, ?, ?)",
-
                 ["ssssss", $username, password_hash($password, PASSWORD_BCRYPT), $first_name, $surname, $email, $profilePicture]);
-
-
         }
 
         /**
@@ -297,10 +311,7 @@
                                    string $email = null,
                                    string $profilePicture = null): int
         {
-            $userManager = new UserManager();
-            if ($userManager->getLoggedInUserId() != $userId) {
-                throw new NotAuthorizedException();
-            }
+            
             $fields = "";
             $params = [""];
             if ($username !== null && $this->verifyUsername($username)) {
@@ -357,7 +368,7 @@
                 throw new NotAuthorizedException();
             }
             if ($this->validatePassword($password)) {
-                $updatedRows = $this->update("UPDATE user SET password = ? WHERE id = ?", ["ss", $password, $userId]);
+                $updatedRows = $this->update("UPDATE user SET password = ? WHERE id = ?", ["ss", password_hash($password,PASSWORD_BCRYPT), $userId]);
                 if ($updatedRows == 0) {
                     throw new UserDoesNotExistException("User with id $userId does not exist");
                 }
@@ -379,17 +390,36 @@
          */
         public function deleteUser(int $userId): int
         {
+            if (True) {
             $userManager = new UserManager();
             if ($userManager->getLoggedInUserId() != $userId) {
                 throw new NotAuthorizedException();
             }
-
+            $rid=[];
+            $chatroomm=new ChatroomModel();
+            // try{
+                $rid=$this->getChatRooms($userId);
+            // }catch(UserDoesNotExistException $e){
+            //     //do nothing
+            // }
+            foreach ($rid as $chatroom) {
+                $chatroomm->deleteUserFromChatRoom($userId,$chatroom['id']);
+            }}
+            $mess=new MessageModel();
+            $mess->deleteUserMessages($userId); 
+            $pix=new PixelModel();
+            $myPixels=$pix->getPixelsByUserId($userId);
+            foreach ($myPixels as $pixel) {
+                $pix->changeUserId($pixel['id']);
+            }
+            
             $deleteRows = $this->delete("DELETE FROM user WHERE id = ?", ["i", $userId]);
             if ($deleteRows == 0) {
                 throw new UserDoesNotExistException("User with id $userId does not exist");
             }
             return $userId;
         }
+    
 
 
         /**
@@ -424,6 +454,7 @@
             return $data;
 
         }
+
 
         /**
          * Get the messages of a user if the user is logged in and the room is in the user's rooms
@@ -489,5 +520,23 @@
             return $data;
         }
 
+        public function getMyChatrooms(int $userId): array
+        {
+            $userManager = new UserManager();
+            if ($userManager->getLoggedInUserId() != $userId) {
+                throw new NotAuthorizedException();
+            }
+            $data = $this->select("
+                                        SELECT 
+                                            chat_room.id,
+                                            chat_room.owner_id
+                                        FROM chat_room
+                                        WHERE chat_room.owner_id = ?
+                                        ORDER BY chat_room.id;", ["i", $userId]);
+            if ($data == null) {
+                throw new UserDoesNotExistException("User with id $userId does not exist");
+            }
+            return $data;
+        }
 
     }

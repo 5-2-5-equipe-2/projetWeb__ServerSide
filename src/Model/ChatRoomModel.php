@@ -26,6 +26,18 @@
             return $this->generateSafeFields();
         }
 
+        protected function generateTypes(): array
+        {
+            return array(
+                "chat_room.id" => "i",
+                "chat_room.name" => "s",
+                "chat_room.description" => "s",
+                "chat_room.is_private" => "i",
+                "chat_room.created_at" => "s",
+                "chat_room.owner_id" => "i",
+            );
+        }
+
         /**
          * Get all chat rooms
          *
@@ -131,5 +143,54 @@
                                         ", ["si", $chatRoomName, $ownerId]);
         }
 
+        public function deleteChatRoom(int $chatRoomId): bool
+        {
+            $messages = $this->getMessages($chatRoomId);
+            $messageModel = new MessageModel();
+            foreach ($messages as $message) {
+                $messageModel->deleteMessage($message["id"]);
+            }
+            return $this->delete("DELETE FROM chat_room
+                                        WHERE id = ?
+                                        ", ["i", $chatRoomId]);
+        }
+
+        public function deleteUserFromChatRoom(int $userId, int $chatRoomId): bool
+        {
+            // get the owner of the chat room        
+            $chatRoom = $this->getChatRoomById($chatRoomId);
+            $this->delete("DELETE FROM chat_room_user
+                                        WHERE user_id = ?
+                                        AND chat_room_id = ?
+                                        ", ["ii", $userId, $chatRoomId]);
+ 
+            $ownerId = $chatRoom[0]["owner_id"];
+            if ($ownerId == $userId) {
+                print_r(count($this->getUsers($chatRoomId)));
+                if (count($this->getUsers($chatRoomId)) == 0) {
+                    $this->deleteChatRoom($chatRoomId);
+                }
+                else {
+                    $this->changeOwner($chatRoomId, $this->getUsers($chatRoomId)[0]["id"]);
+                }
+            }
+            return true;
+        }
+
+        public function changeOwner(int $chatRoomId, int $newOwnerId): bool
+        {
+            return $this->update("UPDATE chat_room
+                                        SET owner_id = ?
+                                        WHERE id = ?
+                                        ", ["ii", $newOwnerId, $chatRoomId]);
+        }
+
+        public function removeOwner(int $chatRoomId): bool
+        {
+            return $this->update("UPDATE chat_room
+                                        SET owner_id = NULL
+                                        WHERE id = ?
+                                        ", ["i", $chatRoomId]);
+        }
 
     }

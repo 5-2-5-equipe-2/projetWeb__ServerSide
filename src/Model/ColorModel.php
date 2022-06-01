@@ -21,6 +21,15 @@
             return $this->generateSafeFields();
         }
 
+        protected function generateTypes(): array
+        {
+            return array(
+                "color.id" => "i",
+                "color.name" => "s",
+                "color.hex_code" => "s",
+            );
+        }
+
         /**
          * Get all colors
          *

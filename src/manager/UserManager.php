@@ -116,7 +116,7 @@
                 unset($_SESSION[self::SESSION_FIELD_USERNAME]);
                 unset($_SESSION[self::SESSION_FIELD_LAST_RESYNC]);
             } else {
-                throw new NotLoggedInException();
+                throw new NotLoggedInException("User not logged in");
             }
 
         }
@@ -134,14 +134,28 @@
          */
         public function updateUser(...$args): void
         {
-
-            $this->userModel->updateUser(...$args);
+            $id=$this->getLoggedInUserId();
+            $args=$args[0];
+            isset($args["username"]) ? $username = $args["username"] : $username = null;
+            isset($args["email"]) ? $email = $args["email"] : $email = null;
+            isset($args["firstname"]) ? $firstname = $args["firstname"] : $firstname = null;
+            isset($args["surname"]) ? $surname = $args["surname"] : $surname = null;
+            isset($args["profilePicture"]) ? $profilePicture = $args["profilePicture"] : $profilePicture = null;
+            $this->userModel->updateUser($id,$username,$firstname,$surname,$email,$profilePicture);
         }
-
+        public function updatePassword(...$args): void
+        {
+            $id=$this->getLoggedInUserId();
+            $this->userModel->updatePassword($id,$args[0]["password"]);
+        }
         /**
          * Check if the user is logged in
          *
          */
+        public function deleteUser(...$args): void
+        {
+            $this->userModel->deleteUser($args[0]["id"]);
+        }
         public function isLoggedIn(): bool
         {
             return isset($_SESSION[self::SESSION_FIELD_LOGGED_IN]);

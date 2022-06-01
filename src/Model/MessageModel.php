@@ -3,6 +3,7 @@
     namespace Models;
     require_once PROJECT_ROOT_PATH . 'Model/Database.php';
 
+    use Auth\Exceptions\MessageDoesNotExistException;
     use Auth\Exceptions\NotAuthorizedException;
     use Database\Exceptions\DatabaseError;
     use DateTime;
@@ -29,6 +30,16 @@
             return $this->generateSafeFields();
         }
 
+        protected function generateTypes(): array
+        {
+            return array(
+                "message.id" => "i",
+                "message.user_id" => "i",
+                "message.chat_room_id" => "i",
+                "message.content" => "s",
+                "message.sent_date" => "s"
+            );
+        }
 
         /**
          * Get all messages
@@ -58,13 +69,18 @@
          */
         public function getMessageById(int $id): array
         {
-            return $this->select("SELECT 
+            $data = $this->select("SELECT 
                                             {$this->getSafeFields()}
                                         FROM 
                                             message 
                                         WHERE 
                                             id = ?",
                 ["i", $id]);
+            if ($data) {
+                return $data[0];
+            } else {
+                throw new MessageDoesNotExistException();
+            }
         }
 
         /**
@@ -171,6 +187,11 @@
         public function deleteMessage(int $msgId): int
         {
             return $this->delete("DELETE FROM message WHERE id = ?", ["i", $msgId]);
+        }
+
+        public function deleteUserMessages(int $userId): int
+        {
+            return $this->delete("DELETE FROM message WHERE user_id = ?", ["i", $userId]);
         }
 
 

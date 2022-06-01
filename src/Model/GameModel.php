@@ -13,10 +13,10 @@
         {
             return [
                 'games_play.id',
-                'game_code',
-                'soluce',
-                'max_soluce_time',
-                'user_id'
+                'games_play.game_code',
+                'games_play.soluce',
+                'games_play.max_soluce_time',
+                'games_play.user_id'
             ];
         }
 
@@ -26,14 +26,35 @@
         }
         
 
+        public function getGameList() : array
+        {
+            $resp = $this->select("SELECT *
+                                        FROM 
+                                            games_list");
+            return $resp;
+        }
+
+        /**
+         * Get a game
+         * @param $id int The ID of the user
+         * @return array The game details
+         * @throws Exception If the game doesn't exist
+         */
+
         public function getGameForPlayer(int $id) : array
         {
-            
+            $resp = $this->select("SELECT *
+                                        FROM 
+                                            next_time_game");
+            ec
+            $resp2 = $this->getGameList();
+            $n = rand(0, count($resp2) - 1);
+            return $resp2[$n];
         }
 
         public function postSoluceGame(int $id, string $soluce): array
         {
-
+            return array();
         }
     }
 

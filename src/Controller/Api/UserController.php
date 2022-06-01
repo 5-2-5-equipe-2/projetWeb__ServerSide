@@ -27,7 +27,7 @@
                     $intLimit = $queryArgs['limit'];
                 }
 
-                $arrUsers = $userModel->getUsers($intLimit);
+                $arrUsers = $userModel->get($intLimit);
                 $responseData = json_encode($arrUsers);
             } catch (Exception $e) {
                 self::treatBasicExceptions($e);
@@ -54,7 +54,7 @@
 
                 $this->isRequestMethodOrThrow('GET');
                 $userModel = new UserModel();
-                $arrUsers = $userModel->getUser($art);
+                $arrUsers = $userModel->get($art);
                 $responseData = json_encode($arrUsers);
             } catch (Exception $e) {
                 self::treatBasicExceptions($e);

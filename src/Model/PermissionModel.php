@@ -17,7 +17,6 @@
 
     class PermissionModel extends Database
     {
-        protected const TABLE = "permissions";
 
         protected function generateSafeFields(): array
         {
@@ -40,6 +39,11 @@
                 "permission.name" => "s",
                 "permission.description" => "s",
             );
+        }
+
+        protected function generateTable(): string
+        {
+            return "permission";
         }
 
         /**

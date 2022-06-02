@@ -347,6 +347,9 @@ abstract class BaseController
             if (count($queryErrors) != 0) {
                 $intLimit = $queryArgs['limit'];
             }
+            else {
+                $intLimit = 50;
+            }
             $arr = $Model->get([], $intLimit);
             $responseData = json_encode($arr);
         } catch (Exception $e) {

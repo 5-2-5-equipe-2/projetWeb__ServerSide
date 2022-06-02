@@ -7,28 +7,14 @@
 
     class MessageController extends BaseController
     {
-        public function listAction(){
-            $strErrorDesc = '';
-            $responseData = array();
-            $strErrorHeader = '';
-                try {
-                    $this->isRequestMethodOrThrow('GET');
-                    $messageModel = new MessageModel();
-                    $intLimit = 10;
-                    list($queryArgs, $queryErrors) = self::getRequiredGetArgs(array('limit'), array('number'));
-                    if (count($queryErrors) == 0) {
-                        $intLimit = $queryArgs['limit'];
-                    }
-                    $arrMessages = $messageModel->getMessages($intLimit);
-                    $responseData = json_encode($arrMessages);
-                
-                } catch (Exception $e) {
-                    self::treatBasicExceptions($e);
-                }
-                self::sendData($strErrorDesc, $strErrorHeader, $responseData);
-            }
 
-        public function getByIdAction(){
+        protected function generateModel(): MessageModel
+        {
+            return new MessageModel();
+        }
+
+        public function getByIdAction()
+        {
             $strErrorDesc = '';
             $responseData = array();
             $strErrorHeader = '';

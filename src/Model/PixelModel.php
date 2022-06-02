@@ -9,16 +9,17 @@
 
     class PixelModel extends Database
     {
+
         protected function generateSafeFields(): array
         {
             return [
                 "pixel.id",
-                "x_position",
-                "y_position",
-                "color_id",
-                "user_id",
-                "last_updated",
-                "number_of_times_placed"
+                "pixel.x_position",
+                "pixel.y_position",
+                "pixel.color_id",
+                "pixel.user_id",
+                "pixel.last_updated",
+                "pixel.number_of_times_placed"
             ];
         }
 
@@ -31,13 +32,18 @@
         {
             return array(
                 "pixel.id" => "i",
-                "x_position" => "i",
-                "y_position" => "i",
-                "color_id" => "i",
-                "user_id" => "i",
-                "last_updated" => "s",
-                "number_of_time_placed" => "i"
+                "pixel.x_position" => "i",
+                "pixel.y_position" => "i",
+                "pixel.color_id" => "i",
+                "pixel.user_id" => "i",
+                "pixel.last_updated" => "s",
+                "pixel.number_of_times_placed" => "i"
             );
+        }
+
+        protected function generateTable(): string
+        {
+            return "pixel";
         }
 
         /**
@@ -177,7 +183,7 @@
 
         public function getPixels(int $limit): array
         {
-            return $this->select("SELECT * FROM pixel ORDER BY id LIMIT =?", ["ii", $limit]);
+            return $this->select("SELECT * FROM pixel ORDER BY id LIMIT ?", ["i", $limit]);
         }
     }
 

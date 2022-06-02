@@ -41,6 +41,11 @@
             );
         }
 
+        protected function generateTable(): string
+        {
+            return "games_play";
+        }
+
         public function getGameList(int $difficulty = 0, int $times = 0) : array
         {
             $resp = $this->select("SELECT *

@@ -12,7 +12,6 @@
 
     class MessageModel extends Database
     {
-        const  TABLE = "message";
 
         protected function generateSafeFields(): array
         {
@@ -39,6 +38,11 @@
                 "message.content" => "s",
                 "message.sent_date" => "s"
             );
+        }
+
+        protected function generateTable(): string
+        {
+            return "message";
         }
 
         /**

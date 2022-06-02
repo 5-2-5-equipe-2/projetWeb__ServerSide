@@ -233,9 +233,6 @@ abstract class Database
                     $arr[0] .= $this->getTypes()[$this->getTable() . "." . $key];
                     $query .= $key . " = ? AND ";
                 } else {
-                    echo "\n########\n";
-                    print_r( $this->getSafeFieldsAsArray());
-                    echo "\n########\n";
 
                     throw new AttributeDoesNotExistException($message = "Attribute $key Does Not Exist");
                 }

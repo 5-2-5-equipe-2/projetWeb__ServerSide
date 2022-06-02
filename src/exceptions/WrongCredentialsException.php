@@ -1,12 +1,12 @@
 <?php
 
-    namespace Auth\Exceptions;
+namespace Auth\Exceptions;
 
 
-    class WrongCredentialsException extends \Exception
+class WrongCredentialsException extends \Exception
+{
+    public function __construct()
     {
-        public function __construct()
-        {
-            parent::__construct('Wrong credentials', 401);
-        }
+        parent::__construct('Wrong credentials', 401);
     }
+}

@@ -6,8 +6,6 @@
 
     class ChatRoomModel extends Database
     {
-        const TABLE = "chat_room";
-
 
         protected function generateSafeFields(): array
         {
@@ -36,6 +34,11 @@
                 "chat_room.created_at" => "s",
                 "chat_room.owner_id" => "i",
             );
+        }
+
+        protected function generateTable(): string
+        {
+            return "chat_room";
         }
 
         /**
@@ -135,9 +138,9 @@
          * @return array The chat room
          * @throws Exception If the chat room does not exist
          */
-        public function createChatRoom(string $chatRoomName, int $ownerId): array
+        public function createChatRoom(string $chatRoomName, int $ownerId): int
         {
-            return $this->select("INSERT INTO 
+            return $this->insert("INSERT INTO 
                                         chat_room (name, owner_id,created_at)
                                         VALUES (?, ?, NOW())
                                         ", ["si", $chatRoomName, $ownerId]);
@@ -166,7 +169,6 @@
  
             $ownerId = $chatRoom[0]["owner_id"];
             if ($ownerId == $userId) {
-                print_r(count($this->getUsers($chatRoomId)));
                 if (count($this->getUsers($chatRoomId)) == 0) {
                     $this->deleteChatRoom($chatRoomId);
                 }
@@ -185,12 +187,6 @@
                                         ", ["ii", $newOwnerId, $chatRoomId]);
         }
 
-        public function removeOwner(int $chatRoomId): bool
-        {
-            return $this->update("UPDATE chat_room
-                                        SET owner_id = NULL
-                                        WHERE id = ?
-                                        ", ["i", $chatRoomId]);
-        }
+       
 
     }

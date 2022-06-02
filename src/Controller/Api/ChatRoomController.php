@@ -7,88 +7,10 @@
 
     class ChatRoomController extends BaseController
     {
-        public function listAction()
+
+        protected function generateModel() : ChatRoomModel
         {
-            $strErrorDesc = '';
-            $responseData = array();
-            $strErrorHeader = '';
-            $requestMethod = $_SERVER["REQUEST_METHOD"];
-            $arrQueryStringParams = $this->getGETData();
-
-            if (strtoupper($requestMethod) == 'GET') {
-                try {
-                    $chatRoomModel = new ChatRoomModel();
-
-                    $intLimit = 10;
-                    if (isset($arrQueryStringParams['limit']) && $arrQueryStringParams['limit']) {
-                        $intLimit = $arrQueryStringParams['limit'];
-                    }
-
-                    $arrChatRoom = $chatRoomModel->getChatRooms($intLimit);
-                    $responseData = json_encode($arrChatRoom);
-                } catch (Exception $e) {
-                    $strErrorDesc = $e->getMessage() . 'Something went wrong! Please contact support.';
-                    $strErrorHeader = 'HTTP/1.1 500 Internal Server Error';
-
-                }
-            } else {
-                $strErrorDesc = 'Method not supported';
-                $strErrorHeader = 'HTTP/1.1 422 Unprocessable Entity';
-            }
-
-            // send output
-            if (!$strErrorDesc) {
-                $this->sendOutput(
-                    $responseData,
-                    array('Content-Type: application/json', 'HTTP/1.1 200 OK')
-                );
-            } else {
-                $this->sendOutput(json_encode(array('error' => $strErrorDesc)),
-                    array('Content-Type: application/json', $strErrorHeader)
-                );
-            }
-        }
-
-        public function getAction()
-        {
-            $strErrorDesc = '';
-            $responseData = array();
-            $strErrorHeader = '';
-            $requestMethod = $_SERVER["REQUEST_METHOD"];
-            $arrQueryStringParams = $this->getGETData();
-
-            if (strtoupper($requestMethod) == 'GET') {
-                try {
-                    $chatRoomModel = new ChatRoomModel();
-
-                    $chatRoomId = 10;
-                    if (isset($arrQueryStringParams['id']) && $arrQueryStringParams['id']) {
-                        $chatRoomId = $arrQueryStringParams['id'];
-                    }
-
-                    $arrChatRoom = $chatRoomModel->getChatRoomById($chatRoomId);
-                    $responseData = json_encode($arrChatRoom);
-                } catch (Exception $e) {
-                    $strErrorDesc = $e->getMessage() . 'Something went wrong! Please contact support.';
-                    $strErrorHeader = 'HTTP/1.1 500 Internal Server Error';
-
-                }
-            } else {
-                $strErrorDesc = 'Method not supported';
-                $strErrorHeader = 'HTTP/1.1 422 Unprocessable Entity';
-            }
-
-            // send output
-            if (!$strErrorDesc) {
-                $this->sendOutput(
-                    $responseData,
-                    array('Content-Type: application/json', 'HTTP/1.1 200 OK')
-                );
-            } else {
-                $this->sendOutput(json_encode(array('error' => $strErrorDesc)),
-                    array('Content-Type: application/json', $strErrorHeader)
-                );
-            }
+            return new ChatRoomModel();
         }
 
         /*
@@ -96,50 +18,141 @@
          *
          *
          */
-        public function getMessagesAction()
-        {
+        public function getMessagesAction(){
             $strErrorDesc = '';
             $responseData = array();
             $strErrorHeader = '';
-            $requestMethod = $_SERVER["REQUEST_METHOD"];
-            $arrQueryStringParams = $this->getGETData();
-
-            if (strtoupper($requestMethod) == 'GET') {
                 try {
-                    $chatRoomModel = new ChatRoomModel();
+                    $this->isRequestMethodOrThrow('GET');
+                    $chatRoomModel = new chatRoomModel();
+                    $queryArgs= self::getRequiredGetArgsOrThrow(array('chatRoomId','limit'), array('number','number'));
+                    $arrChatRooms = $chatRoomModel->getMessages($queryArgs['chatRoomId'], $queryArgs['limit']);
+                    $responseData = json_encode($arrChatRooms);
+                
+                } catch (Exception $e) {
+                    self::treatBasicExceptions($e);
+                }
+                self::sendData($strErrorDesc, $strErrorHeader, $responseData);
+            }
 
-                    $chatRoomId = null;
-                    $limit = 10;
-                    if (isset($arrQueryStringParams['id']) && $arrQueryStringParams['id']) {
-                        if (isset($arrQueryStringParams['limit']) && $arrQueryStringParams['limit']) {
-                            $limit = $arrQueryStringParams['limit'];
+            public function getUsersAction(){
+                $strErrorDesc = '';
+                $responseData = array();
+                $strErrorHeader = '';
+                    try {
+                        $this->isRequestMethodOrThrow('GET');
+                        $chatRoomModel = new chatRoomModel();
+                        $queryArgs= self::getRequiredGetArgsOrThrow(array('chatRoomId'), array('number'));
+                        $arrChatRooms = $chatRoomModel->getUsers($queryArgs['chatRoomId']);
+                        $responseData = json_encode($arrChatRooms);
+                    
+                    } catch (Exception $e) {
+                        self::treatBasicExceptions($e);
+                    }
+                    self::sendData($strErrorDesc, $strErrorHeader, $responseData);
+                }
+            
+                public function getChatRoomByIdAction(){
+                    $strErrorDesc = '';
+                    $responseData = array();
+                    $strErrorHeader = '';
+                        try {
+                            $this->isRequestMethodOrThrow('GET');
+                            $chatRoomModel = new chatRoomModel();
+                            $queryArgs= self::getRequiredGetArgsOrThrow(array('chatRoomId'), array('number'));
+                            $arrChatRooms = $chatRoomModel->getChatRoomById($queryArgs['chatRoomId']);
+                            $responseData = json_encode($arrChatRooms);
+                        
+                        } catch (Exception $e) {
+                            self::treatBasicExceptions($e);
                         }
-                        $chatRoomId = $arrQueryStringParams['id'];
+                        self::sendData($strErrorDesc, $strErrorHeader, $responseData);
                     }
 
-                    $arrChatRoom = $chatRoomModel->getMessages($chatRoomId, $limit);
-                    $responseData = json_encode($arrChatRoom);
-                } catch (Exception $e) {
-                    $strErrorDesc = $e->getMessage() . 'Something went wrong! Please contact support.';
-                    $strErrorHeader = 'HTTP/1.1 500 Internal Server Error';
+                    public function deleteChatRoomAction(){
+                        $strErrorDesc = '';
+                        $responseData = array();
+                        $strErrorHeader = '';
+                            try {
+                                $this->isRequestMethodOrThrow('PUT');
+                                $chatRoomModel = new chatRoomModel();
+                                $queryArgs= self::getRequiredPutArgsOrThrow(array('chatRoomId'), array('number'));
+                                $arrChatRooms = $chatRoomModel->deleteChatRoom($queryArgs['chatRoomId']);
+                                $responseData = json_encode($arrChatRooms);
+                            } catch (Exception $e) {
+                                self::treatBasicExceptions($e);
+                            }
+                            self::sendData($strErrorDesc, $strErrorHeader, $responseData);
+                        }
+    
 
-                }
-            } else {
-                $strErrorDesc = 'Method not supported';
-                $strErrorHeader = 'HTTP/1.1 422 Unprocessable Entity';
-            }
+                    public function getChatRoomByNameAction(){
+                        $strErrorDesc = '';
+                        $responseData = array();
+                        $strErrorHeader = '';
+                            try {
+                                $this->isRequestMethodOrThrow('GET');
+                                $chatRoomModel = new chatRoomModel();
+                                $queryArgs= self::getRequiredGetArgsOrThrow(array('chatRoomName'), array('string'));
+                                $arrChatRooms = $chatRoomModel->getChatRoomByName($queryArgs['chatRoomName']);
+                                $responseData = json_encode($arrChatRooms);
+                            
+                            } catch (Exception $e) {
+                                self::treatBasicExceptions($e);
+                            }
+                            self::sendData($strErrorDesc, $strErrorHeader, $responseData);
+                        }
 
-            // send output
-            if (!$strErrorDesc) {
-                $this->sendOutput(
-                    $responseData,
-                    array('Content-Type: application/json', 'HTTP/1.1 200 OK')
-                );
-            } else {
-                $this->sendOutput(json_encode(array('error' => $strErrorDesc)),
-                    array('Content-Type: application/json', $strErrorHeader)
-                );
-            }
-        }
+                        public function createChatRoomAction(){
+                            $strErrorDesc = '';
+                            $responseData = array();
+                            $strErrorHeader = '';
+                                try {
+                                    $this->isRequestMethodOrThrow('GET');
+                                    $chatRoomModel = new chatRoomModel();
+                                    $queryArgs= self::getRequiredGetArgsOrThrow(array('chatRoomName','ownerId'), array('string','number'));
+                                    $arrChatRooms = $chatRoomModel->createChatRoom($queryArgs['chatRoomName'], $queryArgs['ownerId']);
+                                    $responseData = json_encode($arrChatRooms);
+                                
+                                } catch (Exception $e) {
+                                    self::treatBasicExceptions($e);
+                                }
+                                self::sendData($strErrorDesc, $strErrorHeader, $responseData);
+                            }
+
+                            public function deleteUserFromChatRoomAction(){
+                                $strErrorDesc = '';
+                                $responseData = array();
+                                $strErrorHeader = '';
+                                    try {
+                                        $this->isRequestMethodOrThrow('PUT');
+                                        $chatRoomModel = new chatRoomModel();
+                                        $queryArgs= self::getRequiredPutArgsOrThrow(array('userId','chatRoomId'), array('number','number'));
+                                        $arrChatRooms = $chatRoomModel->deleteUserFromChatRoom($queryArgs['userId'], $queryArgs['chatRoomId']);
+                                        $responseData = json_encode($arrChatRooms);
+                                    
+                                    } catch (Exception $e) {
+                                        self::treatBasicExceptions($e);
+                                    }
+                                    self::sendData($strErrorDesc, $strErrorHeader, $responseData);
+                                }
+
+                                public function changeOwnerAction(){
+                                    $strErrorDesc = '';
+                                    $responseData = array();
+                                    $strErrorHeader = '';
+                                        try {
+                                            $this->isRequestMethodOrThrow('PUT');
+                                            $chatRoomModel = new chatRoomModel();
+                                            $queryArgs= self::getRequiredPutArgsOrThrow(array('chatRoomId','newOwnerId'), array('number','number'));
+                                            $arrChatRooms = $chatRoomModel->changeOwner($queryArgs['chatRoomId'], $queryArgs['newOwnerId']);
+                                            $responseData = json_encode($arrChatRooms);
+                                        
+                                        } catch (Exception $e) {
+                                            self::treatBasicExceptions($e);
+                                        }
+                                        self::sendData($strErrorDesc, $strErrorHeader, $responseData);
+                                    }
+
 
     }

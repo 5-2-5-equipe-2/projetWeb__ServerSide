@@ -99,6 +99,12 @@ CREATE TABLE `games_play` (
   `user_id` int(11) DEFAULT NULL
 );
 
+CREATE TABLE `games_soluce` (
+  `id` int(11) NOT NULL,
+  `game_code` int(11) DEFAULT NULL,
+  `soluce` text
+);
+
 ALTER TABLE `chat_room`
     ADD FOREIGN KEY (`owner_id`) REFERENCES `user` (`id`);
 
@@ -137,14 +143,15 @@ ALTER TABLE `games_list`
 
 ALTER TABLE `games_list`
     MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-COMMIT;
 
 ALTER TABLE `games_play`
     ADD PRIMARY KEY (`id`);
 
 ALTER TABLE `games_play`
     MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-COMMIT;
+
+ALTER TABLE `games_soluce`
+    ADD PRIMARY KEY (`id`);
 
 # create debug users
 INSERT INTO user (username, password)
@@ -271,6 +278,14 @@ INSERT INTO pixel (id, x_position, y_position, color_id, user_id, last_updated, 
 VALUES (15, 8, 7, 7, 3, '2018-01-01 00:00:00', 1);
 INSERT INTO pixel (id, x_position, y_position, color_id, user_id, last_updated, number_of_times_placed)
 VALUES (16, 8, 8, 8, 4, '2018-01-01 00:00:00', 1);
+
+INSERT INTO `games_soluce` (`id`, `game_code`, `soluce`) VALUES
+(1, 1, 'test'),
+(2, 1, 'test2'),
+(3, 2, 'test'),
+(4, 2, 'test'),
+(5, 3, 'test3'),
+(6, 3, 'tezt');
 
 
 

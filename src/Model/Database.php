@@ -221,14 +221,15 @@ abstract class Database
      * @throws DatabaseError
      * 
      */
-    public function get(array $parameters,$limit=50): array
+    public function get(array $parameters, $limit = 50): array
     {
         $query = "SELECT {$this->getSafeFields()} FROM {$this->TABLE} WHERE ";
         $arr = [""];
+        
         if (count($parameters) > 0) {
 
             foreach ($parameters as $key => $value) {
-                if (in_array($this->getTable()."." . $key, $this->generateSafeFields())) {
+                if (in_array($this->getTable() . "." . $key, $this->generateSafeFields())) {
                     $arr[] = $value;
                     $arr[0] .= $this->getTypes()[$this->getTable() . "." . $key];
                     $query .= $key . " = ? AND ";
@@ -247,10 +248,10 @@ abstract class Database
         $arr[] = $limit;
         $arr[0] .= "i";
         $data = $this->select($query, $arr);
-        if ($data) {
-            return $data;
-        } else {
-            throw new ElementDoesNotExistException($message = "Element Does Not Exist");
-        }
+        // if ($data) {
+        return $data;
+        // } else {
+        //     throw new ElementDoesNotExistException($message = "Element Does Not Exist");
+        // }
     }
 }

@@ -309,14 +309,19 @@ abstract class BaseController
             $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_QUERY);
             $parameters = explode("&", $uri);
             $art = [];
+            $limit=50;
             foreach ($parameters as $value) {
                 $s = explode("=", $value);
-                $art[$s[0]] = $s[1];
+                if (strcmp($s[0], "limit") == 0) {
+                    $limit = $s[1];
+                } else {
+                    $art[$s[0]] = $s[1];
+                }
             }
 
             $this->isRequestMethodOrThrow('GET');
             $model = $this->getModel();
-            $arrUsers = $model->get($art);
+            $arrUsers = $model->get($art, $limit);
             $responseData = json_encode($arrUsers);
         } catch (Exception $e) {
             self::treatBasicExceptions($e);
@@ -329,27 +334,24 @@ abstract class BaseController
     /**
      * "/?/list" Endpoint - Get list of ?
      */
-    public function listAction(){
+    public function listAction()
+    {
         $strErrorDesc = '';
         $responseData = array();
         $strErrorHeader = '';
-            try {
-                $this->isRequestMethodOrThrow('GET');
-                $Model = $this->getModel();
-                $intLimit = 10;
-                list($queryArgs, $queryErrors) = self::getRequiredGetArgs(array('limit'), array('number'));
-                if (count($queryErrors) != 0) {
-                    $intLimit = $queryArgs['limit'];
-                }
-                $arr = $Model->get([],$intLimit);
-                $responseData = json_encode($arr);
-            
-            } catch (Exception $e) {
-                self::treatBasicExceptions($e);
+        try {
+            $this->isRequestMethodOrThrow('GET');
+            $Model = $this->getModel();
+            $intLimit = 10;
+            list($queryArgs, $queryErrors) = self::getRequiredGetArgs(array('limit'), array('number'));
+            if (count($queryErrors) != 0) {
+                $intLimit = $queryArgs['limit'];
             }
-            self::sendData($strErrorDesc, $strErrorHeader, $responseData);
+            $arr = $Model->get([], $intLimit);
+            $responseData = json_encode($arr);
+        } catch (Exception $e) {
+            self::treatBasicExceptions($e);
         }
-
-
-
+        self::sendData($strErrorDesc, $strErrorHeader, $responseData);
+    }
 }

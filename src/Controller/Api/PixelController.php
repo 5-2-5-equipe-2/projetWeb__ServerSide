@@ -153,30 +153,4 @@ class PixelController extends BaseController
         self::sendData($strErrorDesc, $strErrorHeader, $responseData);
     }
 
-    public function getAction()
-    {
-        $strErrorDesc = '';
-        $responseData = array();
-        $strErrorHeader = '';
-
-        try {
-            $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_QUERY);
-            $parameters = explode("&", $uri);
-            $art = [];
-            foreach ($parameters as $value) {
-                $s = explode("=", $value);
-                $art[$s[0]] = $s[1];
-            }
-
-            $this->isRequestMethodOrThrow('GET');
-            $pixelModel = new PixelModel();
-            $arrPixels = $pixelModel->get($art);
-            $responseData = json_encode($arrPixels);
-        } catch (Exception $e) {
-            self::treatBasicExceptions($e);
-        }
-
-        // send output
-        self::sendData($strErrorDesc, $strErrorHeader, $responseData);
-    }
 }

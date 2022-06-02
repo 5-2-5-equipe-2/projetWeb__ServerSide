@@ -58,6 +58,7 @@
                 break;
             default:
                 header("HTTP/1.1 404 Not Found");
+                echo json_encode(array('error' => "The element {$uri[2]} can't be found in the Controllers","details" => "The available Controllers are: user, chatroom, message, pixel, game, color"));
                 exit();
         }
     } else {

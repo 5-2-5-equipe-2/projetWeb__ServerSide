@@ -154,8 +154,8 @@
             if ($userManager->getLoggedInUserId() != $userId) {
                 throw new NotAuthorizedException();
             }
-            return $this->insert("INSERT INTO message (content, user_id, chat_room_id, sent_date) VALUES (?, ?, ?, ?)",
-                ["s", $content, "i", $userId, "i", $chatRoomId, "d", date("Y-m-d H:i:s")]);
+            return $this->insert("INSERT INTO message (content, user_id, chat_room_id, sent_date) VALUES (?, ?, ?, NOW())",
+                ["sii", $content, $userId, $chatRoomId]);
         }
 
 

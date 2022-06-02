@@ -58,6 +58,12 @@
 
         public function getGameForPlayer(int $id, int $difficulty = 0, int $times = 0) : array
         {
+            $cnt = $this->select("SELECT COUNT(*) AS cnt
+                                        FROM 
+                                            games_play WHERE user_id = ?",['i',$id]);
+            if ($cnt[0]['cnt'] > 0){
+                throw new GameAlreadyPlayException();
+            }
             $resp = $this->select("SELECT next_time_game
                                         FROM 
                                              user WHERE id = ?",["i",$id]);

@@ -49,22 +49,22 @@
          *
          *
          */
-        public function createAction(){
+        public function createMessageAction(){
             $strErrorDesc = '';
-            $responseData = array();
-            $strErrorHeader = '';
-                try {
-                    $this->isRequestMethodOrThrow('POST');
-                    $messageModel = new MessageModel();
-                    list($queryArgs, $queryErrors) = self::getRequiredPostArgsorThrow(array('content','userId','chatRoomId'), array('string','string','number'));
-                    $arrMessages = $messageModel->createMessage($queryArgs['content'],$queryArgs['userId'],$queryArgs['chatRoomId']);
-                    $responseData = json_encode($arrMessages);
-                
-                } catch (Exception $e) {
-                    self::treatBasicExceptions($e);
+                $responseData = array();
+                $strErrorHeader = '';
+                    try {
+                        $this->isRequestMethodOrThrow('POST');
+                        $messageModel = new MessageModel();
+                        $queryArgs= self::getRequiredPostArgsOrThrow(array('content','userId','chatRoomId'), array('string','number','number'));
+                        $arrMessages = $messageModel->createMessage($queryArgs['content'],$queryArgs['userId'],$queryArgs['chatRoomId']);
+                        $responseData = json_encode($arrMessages);
+                    
+                    } catch (Exception $e) {
+                        self::treatBasicExceptions($e);
+                    }
+                    self::sendData($strErrorDesc, $strErrorHeader, $responseData);
                 }
-                self::sendData($strErrorDesc, $strErrorHeader, $responseData);
-            }
 
             public function searchMessagesAction(){
             $strErrorDesc = '';
@@ -73,8 +73,8 @@
                 try {
                     $this->isRequestMethodOrThrow('GET');
                     $messageModel = new MessageModel();
-                    list($queryArgs, $queryErrors) = self::getRequiredGetArgsorThrow(array('query','limit'), array('string','number'));
-                    $arrMessages = $messageModel->searchMessages($queryArgs['query'],$queryArgs['id']);
+                    $queryArgs= self::getRequiredGetArgsorThrow(array('query','limit'), array('string','number'));
+                    $arrMessages = $messageModel->searchMessages($queryArgs['query'],$queryArgs['limit']);
                     $responseData = json_encode($arrMessages);
                 
                 } catch (Exception $e) {
@@ -90,7 +90,7 @@
                     try {
                         $this->isRequestMethodOrThrow('GET');
                         $messageModel = new MessageModel();
-                        list($queryArgs, $queryErrors) = self::getRequiredGetArgsorThrow(array('startDat','endDate','limit'), array('string','string','number'));
+                        $queryArgs= self::getRequiredGetArgsorThrow(array('startDat','endDate','limit'), array('string','string','number'));
                         $arrMessages = $messageModel->getMessagesInDateRange($queryArgs['startDat'],$queryArgs['endDate'],$queryArgs['limit']);
                         $responseData = json_encode($arrMessages);
                     
@@ -107,7 +107,7 @@
                         try {
                             $this->isRequestMethodOrThrow('PUT');
                             $messageModel = new MessageModel();
-                            list($queryArgs, $queryErrors) = self::getRequiredPutArgsorThrow(array('msgId','content'), array('number','string'));
+                            $queryArgs= self::getRequiredPutArgsorThrow(array('msgId','content'), array('number','string'));
                             $arrMessages = $messageModel->modifyMessage($queryArgs['msgId'],$queryArgs['content']);
                             $responseData = json_encode($arrMessages);
                         
@@ -124,7 +124,7 @@
                             try {
                                 $this->isRequestMethodOrThrow('PUT');
                                 $messageModel = new MessageModel();
-                                list($queryArgs, $queryErrors) = self::getRequiredPutArgsorThrow(array('userId'), array('number'));
+                                $queryArgs= self::getRequiredPutArgsorThrow(array('userId'), array('number'));
                                 $arrMessages = $messageModel->deleteUserMessages($queryArgs['userId']);
                                 $responseData = json_encode($arrMessages);
                             
@@ -134,14 +134,14 @@
                             self::sendData($strErrorDesc, $strErrorHeader, $responseData);
                         }
                     
-                        public functiondeleteMessageAction(){
+                        public function deleteMessageAction(){
                             $strErrorDesc = '';
                             $responseData = array();
                             $strErrorHeader = '';
                                 try {
                                     $this->isRequestMethodOrThrow('PUT');
                                     $messageModel = new MessageModel();
-                                    list($queryArgs, $queryErrors) = self::getRequiredPutArgsorThrow(array('userId'), array('number'));
+                                    $queryArgs= self::getRequiredPutArgsorThrow(array('userId'), array('number'));
                                     $arrMessages = $messageModel->deleteUserMessages($queryArgs['userId']);
                                     $responseData = json_encode($arrMessages);
                                 

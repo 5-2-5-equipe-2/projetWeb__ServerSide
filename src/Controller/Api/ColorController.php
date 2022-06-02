@@ -10,30 +10,10 @@
 
     class ColorController extends BaseController
     {
-        /**
-         */
-        public function listAction()
+
+        protected function generateModel(): ColorModel
         {
-            $strErrorDesc = '';
-            $responseData = array();
-            $strErrorHeader = '';
-            try {
-                $this->isRequestMethodOrThrow('GET');
-                $colorModel = new ColorModel();
-                $intLimit = 10;
-                list($queryArgs, $queryErrors) = self::getRequiredGetArgs(array('limit'), array('number'));
-                if (count($queryErrors) == 0) {
-                    $intLimit = $queryArgs['limit'];
-                }
-
-                $arrColors = $colorModel->getColors($intLimit);
-                $responseData = json_encode($arrColors);
-            } catch (Exception $e) {
-                self::treatBasicExceptions($e);
-
-            }
-            // send output
-            self::sendData($strErrorDesc, $strErrorHeader, $responseData);
+            return new ColorModel();
         }
 
         public function getColorByIdAction(){

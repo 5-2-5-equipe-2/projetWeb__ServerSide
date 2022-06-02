@@ -7,30 +7,11 @@
 
     class ChatRoomController extends BaseController
     {
-        public function listAction()
+
+        protected function generateModel() : ChatRoomModel
         {
-            $strErrorDesc = '';
-            $responseData = array();
-            $strErrorHeader = '';
-            try {
-                $this->isRequestMethodOrThrow('GET');
-                $chatRoomModel = new chatRoomModel();
-                $intLimit = 10;
-                list($queryArgs, $queryErrors) = self::getRequiredGetArgs(array('limit'), array('number'));
-                if (count($queryErrors) == 0) {
-                    $intLimit = $queryArgs['limit'];
-                }
-
-                $arrChatRoom = $chatRoomModel->getChatrooms($intLimit);
-                $responseData = json_encode($arrChatRoom);
-            } catch (Exception $e) {
-                self::treatBasicExceptions($e);
-
-            }
-            // send output
-            self::sendData($strErrorDesc, $strErrorHeader, $responseData);
+            return new ChatRoomModel();
         }
-
 
         /*
          * get chat room messages
@@ -98,7 +79,6 @@
                                 $queryArgs= self::getRequiredPutArgsOrThrow(array('chatRoomId'), array('number'));
                                 $arrChatRooms = $chatRoomModel->deleteChatRoom($queryArgs['chatRoomId']);
                                 $responseData = json_encode($arrChatRooms);
-                            
                             } catch (Exception $e) {
                                 self::treatBasicExceptions($e);
                             }

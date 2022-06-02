@@ -19,7 +19,7 @@
                 "pixel.color_id",
                 "pixel.user_id",
                 "pixel.last_updated",
-                "pixel.number_of_time_placed"
+                "pixel.number_of_times_placed"
             ];
         }
 

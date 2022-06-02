@@ -9,6 +9,11 @@
 
     class GameController extends BaseController
     {
+
+        protected function generateModel(): GameModel
+        {
+            return new GameModel();
+        }
         /**
          * "/game/getRandom" Endpoint - Get a random game
          */

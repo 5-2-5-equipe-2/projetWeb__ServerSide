@@ -7,43 +7,10 @@
 
     class MessageController extends BaseController
     {
-        public function listAction()
+
+        protected function generateModel(): MessageModel
         {
-            $strErrorDesc = '';
-            $responseData = array();
-            $strErrorHeader = '';
-            $requestMethod = $_SERVER["REQUEST_METHOD"];
-            $arrQueryStringParams = $this->getGETData();
-
-            if (strtoupper($requestMethod) == 'GET') {
-                try {
-                    $messageModel = new MessageModel();
-                    $intLimit = 10;
-                    if (isset($arrQueryStringParams['limit']) && $arrQueryStringParams['limit']) {
-                        $intLimit = $arrQueryStringParams['limit'];
-                    }
-                    $arrMessage = $messageModel->getMessages($intLimit);
-                    $responseData = json_encode($arrMessage);
-                } catch (Exception $e) {
-                    self::treatBasicExceptions($e);
-
-                }
-            } else {
-                $strErrorDesc = 'Method not supported';
-                $strErrorHeader = 'HTTP/1.1 422 Unprocessable Entity';
-            }
-
-            // send output
-            if (!$strErrorDesc) {
-                $this->sendOutput(
-                    $responseData,
-                    array('Content-Type: application/json', 'HTTP/1.1 200 OK')
-                );
-            } else {
-                $this->sendOutput(json_encode(array('error' => $strErrorDesc)),
-                    array('Content-Type: application/json', $strErrorHeader)
-                );
-            }
+            return new MessageModel();
         }
 
         public function getByIdAction()

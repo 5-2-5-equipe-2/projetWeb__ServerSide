@@ -10,26 +10,10 @@
 
     class PixelController extends BaseController
     {
-        public function listAction(){
-            $strErrorDesc = '';
-            $responseData = array();
-            $strErrorHeader = '';
-                try {
-                    $this->isRequestMethodOrThrow('GET');
-                    $pixelModel = new PixelModel();
-                    $intLimit = 10;
-                    list($queryArgs, $queryErrors) = self::getRequiredGetArgs(array('limit'), array('number'));
-                    if (count($queryErrors) == 0) {
-                        $intLimit = $queryArgs['limit'];
-                    }
-                    $arrPixels = $pixelModel->getPixels($intLimit);
-                    $responseData = json_encode($arrPixels);
-                
-                } catch (Exception $e) {
-                    self::treatBasicExceptions($e);
-                }
-                self::sendData($strErrorDesc, $strErrorHeader, $responseData);
-            }
+        protected function generateModel(): PixelModel
+        {
+            return new PixelModel();
+        }
 
             public function getPixelsInRectangleAction(){
                 $strErrorDesc = '';

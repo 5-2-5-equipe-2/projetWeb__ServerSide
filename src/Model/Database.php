@@ -56,6 +56,16 @@ abstract class Database
     }
 
     /**
+     * Get the safe fields seperated by commas
+     *
+     * @return string
+     */
+    public function getSafeFieldsAsArray(): array
+    {
+        return $this->FIELDS_SAFE;
+    }
+
+    /**
      * Get the fields seperated by commas
      *
      * @return string
@@ -211,24 +221,37 @@ abstract class Database
      * @throws DatabaseError
      * 
      */
-    public function get(array $parameters): array
+    public function get(array $parameters,$limit=50): array
     {
         $query = "SELECT {$this->getSafeFields()} FROM {$this->TABLE} WHERE ";
         $arr = [""];
-        foreach ($parameters as $key => $value) {
-            if (in_array("user." . $key, $this->generateSafeFields())) {
-                $arr[] = $value;
-                $arr[0] .= $this->getTypes()[$this->getTable() . "." . $key];
-                $query .= $key . " = ? AND ";
-            } else {
-                throw new AttributeDoesNotExistException($message = "Attribute $key Does Not Exist");
+        if (count($parameters) > 0) {
+
+            foreach ($parameters as $key => $value) {
+                if (in_array($this->getTable()."." . $key, $this->generateSafeFields())) {
+                    $arr[] = $value;
+                    $arr[0] .= $this->getTypes()[$this->getTable() . "." . $key];
+                    $query .= $key . " = ? AND ";
+                } else {
+                    echo "\n########\n";
+                    print_r( $this->getSafeFieldsAsArray());
+                    echo "\n########\n";
+
+                    throw new AttributeDoesNotExistException($message = "Attribute $key Does Not Exist");
+                }
             }
         }
-
-        $query = substr($query, 0, -5);
+        if (count($arr) > 1) {
+            $query = substr($query, 0, -5);
+        } else {
+            $query = substr($query, 0, -7);
+        }
+        $query .= " LIMIT ?";
+        $arr[] = $limit;
+        $arr[0] .= "i";
         $data = $this->select($query, $arr);
         if ($data) {
-            return $data[0];
+            return $data;
         } else {
             throw new ElementDoesNotExistException($message = "Element Does Not Exist");
         }

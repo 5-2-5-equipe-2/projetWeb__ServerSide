@@ -7,88 +7,43 @@
 
     class MessageController extends BaseController
     {
-        public function listAction()
-        {
+        public function listAction(){
             $strErrorDesc = '';
             $responseData = array();
             $strErrorHeader = '';
-            $requestMethod = $_SERVER["REQUEST_METHOD"];
-            $arrQueryStringParams = $this->getGETData();
-
-            if (strtoupper($requestMethod) == 'GET') {
                 try {
+                    $this->isRequestMethodOrThrow('GET');
                     $messageModel = new MessageModel();
                     $intLimit = 10;
-                    if (isset($arrQueryStringParams['limit']) && $arrQueryStringParams['limit']) {
-                        $intLimit = $arrQueryStringParams['limit'];
+                    list($queryArgs, $queryErrors) = self::getRequiredGetArgs(array('limit'), array('number'));
+                    if (count($queryErrors) == 0) {
+                        $intLimit = $queryArgs['limit'];
                     }
-                    $arrMessage = $messageModel->getMessages($intLimit);
-                    $responseData = json_encode($arrMessage);
+                    $arrMessages = $messageModel->getMessages($intLimit);
+                    $responseData = json_encode($arrMessages);
+                
                 } catch (Exception $e) {
                     self::treatBasicExceptions($e);
-
                 }
-            } else {
-                $strErrorDesc = 'Method not supported';
-                $strErrorHeader = 'HTTP/1.1 422 Unprocessable Entity';
+                self::sendData($strErrorDesc, $strErrorHeader, $responseData);
             }
 
-            // send output
-            if (!$strErrorDesc) {
-                $this->sendOutput(
-                    $responseData,
-                    array('Content-Type: application/json', 'HTTP/1.1 200 OK')
-                );
-            } else {
-                $this->sendOutput(json_encode(array('error' => $strErrorDesc)),
-                    array('Content-Type: application/json', $strErrorHeader)
-                );
-            }
-        }
-
-        public function getByIdAction()
-        {
+        public function getByIdAction(){
             $strErrorDesc = '';
             $responseData = array();
             $strErrorHeader = '';
-            $requestMethod = $_SERVER["REQUEST_METHOD"];
-            $arrQueryStringParams = $this->getGETData();
-
-            if (strtoupper($requestMethod) == 'GET') {
                 try {
+                    $this->isRequestMethodOrThrow('GET');
                     $messageModel = new MessageModel();
-                    if (isset($arrQueryStringParams['id']) && $arrQueryStringParams['id']) {
-                        $messageId = $arrQueryStringParams['id'];
-                    }
-                    else{
-                        throw new \InvalidArgumentException('Message id is required');
-                    }
-
-                    $arrMessage = $messageModel->getMessageById($messageId);
-                    $responseData = json_encode($arrMessage);
+                    list($queryArgs, $queryErrors) = self::getRequiredGetArgsorThrow(array('id'), array('number'));
+                    $arrMessages = $messageModel->getMessages($queryArgs['id']);
+                    $responseData = json_encode($arrMessages);
+                
                 } catch (Exception $e) {
-                    $strErrorDesc = $e->getMessage() . 'Something went wrong! Please contact support.';
-                    $strErrorHeader = 'HTTP/1.1 500 Internal Server Error';
-
+                    self::treatBasicExceptions($e);
                 }
-            } else {
-                $strErrorDesc = 'Method not supported';
-                $strErrorHeader = 'HTTP/1.1 422 Unprocessable Entity';
+                self::sendData($strErrorDesc, $strErrorHeader, $responseData);
             }
-
-            // send output
-            if (!$strErrorDesc) {
-                $this->sendOutput(
-                    $responseData,
-                    array('Content-Type: application/json', 'HTTP/1.1 200 OK')
-                );
-            } else {
-                $this->sendOutput(json_encode(array('error' => $strErrorDesc)),
-                    array('Content-Type: application/json', $strErrorHeader)
-                );
-            }
-        }
-
         /**
          * create a new message
          *
@@ -98,34 +53,101 @@
             $strErrorDesc = '';
             $responseData = array();
             $strErrorHeader = '';
-            $requestMethod = $_SERVER["REQUEST_METHOD"];
-            $arrQueryStringParams = $this->getGETData();
-
-            if (strtoupper($requestMethod) == 'POST') {
                 try {
-                    $queryArgs = $this->getRequiredGetArgsOrThrow(array('content','userId','chatRoomId'), array('string','number','number'));
+                    $this->isRequestMethodOrThrow('POST');
                     $messageModel = new MessageModel();
-                    $arrMessage = $messageModel->createMessage($queryArgs['content'], $queryArgs['userId'], $queryArgs['chatRoomId']);
-                    $responseData = json_encode($arrMessage);
+                    list($queryArgs, $queryErrors) = self::getRequiredPostArgsorThrow(array('content','userId','chatRoomId'), array('string','string','number'));
+                    $arrMessages = $messageModel->createMessage($queryArgs['content'],$queryArgs['userId'],$queryArgs['chatRoomId']);
+                    $responseData = json_encode($arrMessages);
+                
                 } catch (Exception $e) {
                     self::treatBasicExceptions($e);
                 }
-            } else {
-                $strErrorDesc = 'Method not supported';
-                $strErrorHeader = 'HTTP/1.1 422 Unprocessable Entity';
+                self::sendData($strErrorDesc, $strErrorHeader, $responseData);
             }
 
-            // send output
-            if (!$strErrorDesc) {
-                $this->sendOutput(
-                    $responseData,
-                    array('Content-Type: application/json', 'HTTP/1.1 200 OK')
-                );
-            } else {
-                $this->sendOutput(json_encode(array('error' => $strErrorDesc)),
-                    array('Content-Type: application/json', $strErrorHeader)
-                );
+            public function searchMessagesAction(){
+            $strErrorDesc = '';
+            $responseData = array();
+            $strErrorHeader = '';
+                try {
+                    $this->isRequestMethodOrThrow('GET');
+                    $messageModel = new MessageModel();
+                    list($queryArgs, $queryErrors) = self::getRequiredGetArgsorThrow(array('query','limit'), array('string','number'));
+                    $arrMessages = $messageModel->searchMessages($queryArgs['query'],$queryArgs['id']);
+                    $responseData = json_encode($arrMessages);
+                
+                } catch (Exception $e) {
+                    self::treatBasicExceptions($e);
+                }
+                self::sendData($strErrorDesc, $strErrorHeader, $responseData);
             }
-        }
 
+            public function getMessagesInDateRangeAction(){
+                $strErrorDesc = '';
+                $responseData = array();
+                $strErrorHeader = '';
+                    try {
+                        $this->isRequestMethodOrThrow('GET');
+                        $messageModel = new MessageModel();
+                        list($queryArgs, $queryErrors) = self::getRequiredGetArgsorThrow(array('startDat','endDate','limit'), array('string','string','number'));
+                        $arrMessages = $messageModel->getMessagesInDateRange($queryArgs['startDat'],$queryArgs['endDate'],$queryArgs['limit']);
+                        $responseData = json_encode($arrMessages);
+                    
+                    } catch (Exception $e) {
+                        self::treatBasicExceptions($e);
+                    }
+                    self::sendData($strErrorDesc, $strErrorHeader, $responseData);
+                }
+            
+                public function modifyMessageAction(){
+                    $strErrorDesc = '';
+                    $responseData = array();
+                    $strErrorHeader = '';
+                        try {
+                            $this->isRequestMethodOrThrow('PUT');
+                            $messageModel = new MessageModel();
+                            list($queryArgs, $queryErrors) = self::getRequiredPutArgsorThrow(array('msgId','content'), array('number','string'));
+                            $arrMessages = $messageModel->modifyMessage($queryArgs['msgId'],$queryArgs['content']);
+                            $responseData = json_encode($arrMessages);
+                        
+                        } catch (Exception $e) {
+                            self::treatBasicExceptions($e);
+                        }
+                        self::sendData($strErrorDesc, $strErrorHeader, $responseData);
+                    }
+                
+                    public function deleteUserMessagesAction(){
+                        $strErrorDesc = '';
+                        $responseData = array();
+                        $strErrorHeader = '';
+                            try {
+                                $this->isRequestMethodOrThrow('PUT');
+                                $messageModel = new MessageModel();
+                                list($queryArgs, $queryErrors) = self::getRequiredPutArgsorThrow(array('userId'), array('number'));
+                                $arrMessages = $messageModel->deleteUserMessages($queryArgs['userId']);
+                                $responseData = json_encode($arrMessages);
+                            
+                            } catch (Exception $e) {
+                                self::treatBasicExceptions($e);
+                            }
+                            self::sendData($strErrorDesc, $strErrorHeader, $responseData);
+                        }
+                    
+                        public functiondeleteMessageAction(){
+                            $strErrorDesc = '';
+                            $responseData = array();
+                            $strErrorHeader = '';
+                                try {
+                                    $this->isRequestMethodOrThrow('PUT');
+                                    $messageModel = new MessageModel();
+                                    list($queryArgs, $queryErrors) = self::getRequiredPutArgsorThrow(array('userId'), array('number'));
+                                    $arrMessages = $messageModel->deleteUserMessages($queryArgs['userId']);
+                                    $responseData = json_encode($arrMessages);
+                                
+                                } catch (Exception $e) {
+                                    self::treatBasicExceptions($e);
+                                }
+                                self::sendData($strErrorDesc, $strErrorHeader, $responseData);
+                            }
     }

@@ -100,16 +100,17 @@
                 throw new Exception("Query cannot be empty");
             }
 
-            return $this->select("SELECT 
-                                            {$this->getSafeFields()}
+
+            return $this->select('SELECT 
+                                            '.$this->getSafeFields().'
                                         FROM 
                                             message 
                                         WHERE 
-                                            MATCH(content) AGAINST(?)
+                                            content LIKE ? 
                                         ORDER BY 
                                             sent_date
                                         LIMIT 
-                                            ?",
+                                            ?',
                 ["si", $query, $limit]);
         }
 
@@ -122,7 +123,7 @@
          * @throws Exception If the start date is after the end date
          *
          **/
-        public function getMessagesInDateRange(DateTime $startDate, DateTime $endDate, int $limit): array
+        public function getMessagesInDateRange(string $startDate, string $endDate, int $limit): array
         {
             if ($startDate > $endDate) {
                 throw new Exception("Start date cannot be after end date");
@@ -133,14 +134,14 @@
                                         FROM 
                                             message 
                                         WHERE 
-                                            sent_date >= ?
-                                        AND 
-                                            sent_date <= ?
+                                            sent_date 
+                                        BETWEEN 
+                                            ? AND ?
                                         ORDER BY 
                                             sent_date
                                         LIMIT 
                                             ?",
-                ["ssi", $startDate->format("Y-m-d H:i:s"), $endDate->format("Y-m-d H:i:s"), $limit]);
+                ["ssi", $startDate, $endDate, $limit]);
         }
 
         /**

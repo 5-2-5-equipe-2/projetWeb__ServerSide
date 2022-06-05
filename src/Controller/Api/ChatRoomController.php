@@ -25,8 +25,8 @@
                 try {
                     $this->isRequestMethodOrThrow('GET');
                     $chatRoomModel = new chatRoomModel();
-                    $queryArgs= self::getRequiredGetArgsOrThrow(array('chatRoomId','limit'), array('number','number'));
-                    $arrChatRooms = $chatRoomModel->getMessages($queryArgs['chatRoomId'], $queryArgs['limit']);
+                    $queryArgs= self::getRequiredGetArgsOrThrow(array('chatRoomId','offset','limit'), array('number','number','number'));
+                    $arrChatRooms = $chatRoomModel->getMessages($queryArgs['chatRoomId'], $queryArgs['offset'],$queryArgs['limit']);
                     $responseData = json_encode($arrChatRooms);
                 
                 } catch (Exception $e) {

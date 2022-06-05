@@ -24,7 +24,8 @@ CREATE TABLE `chat_room`
     `owner_id`    integer      NOT NULL,
     `created_at`  datetime     NOT NULL,
     `description` text,
-    `is_private`   boolean
+    `is_private`   boolean,
+    `profile_picture` varchar(500)
 );
 
 CREATE TABLE `moderator`

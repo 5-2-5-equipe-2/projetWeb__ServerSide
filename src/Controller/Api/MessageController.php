@@ -62,7 +62,6 @@
                     $queryArgs= self::getRequiredGetArgsorThrow(array('query','limit'), array('string','number'));
                     $arrMessages = $messageModel->searchMessages($queryArgs['query'],$queryArgs['limit']);
                     $responseData = json_encode($arrMessages);
-                
                 } catch (Exception $e) {
                     self::treatBasicExceptions($e);
                 }
@@ -76,7 +75,7 @@
                     try {
                         $this->isRequestMethodOrThrow('GET');
                         $messageModel = new MessageModel();
-                        $queryArgs= self::getRequiredGetArgsorThrow(array('startDat','endDate','limit'), array('string','string','number'));
+                        $queryArgs= self::getRequiredGetArgsorThrow(array('startDat','endDate','limit'), array('date','date','number'));
                         $arrMessages = $messageModel->getMessagesInDateRange($queryArgs['startDat'],$queryArgs['endDate'],$queryArgs['limit']);
                         $responseData = json_encode($arrMessages);
                     
@@ -127,8 +126,8 @@
                                 try {
                                     $this->isRequestMethodOrThrow('PUT');
                                     $messageModel = new MessageModel();
-                                    $queryArgs= self::getRequiredPutArgsorThrow(array('userId'), array('number'));
-                                    $arrMessages = $messageModel->deleteUserMessages($queryArgs['userId']);
+                                    $queryArgs= self::getRequiredPutArgsorThrow(array('msgId'), array('number'));
+                                    $arrMessages = $messageModel->deleteUserMessages($queryArgs['msgId']);
                                     $responseData = json_encode($arrMessages);
                                 
                                 } catch (Exception $e) {

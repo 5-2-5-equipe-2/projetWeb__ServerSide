@@ -8,6 +8,8 @@ services:
       - "80:80"
     volumes:
       - ./src:/var/www/html
+      - images:/var/www/html/images
+      - images2:/tmp/
     depends_on:
       - db
     links:
@@ -60,5 +62,7 @@ services:
       - default
 volumes:
   data:
+  images:
+  images2:
 
 

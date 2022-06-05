@@ -105,6 +105,13 @@ CREATE TABLE `games_soluce` (
   `soluce` text
 );
 
+CREATE TABLE `files` (
+  `id` int(11) NOT NULL,
+  `url` varchar(500),
+  `size` int
+);
+
+
 ALTER TABLE `chat_room`
     ADD FOREIGN KEY (`owner_id`) REFERENCES `user` (`id`);
 

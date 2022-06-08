@@ -344,7 +344,7 @@ abstract class BaseController
             $Model = $this->getModel();
             $intLimit = 10;
             list($queryArgs, $queryErrors) = self::getRequiredGetArgs(array('limit'), array('number'));
-            if (count($queryErrors) != 0) {
+            if (count($queryErrors) == 0) {
                 $intLimit = $queryArgs['limit'];
             }
             else {

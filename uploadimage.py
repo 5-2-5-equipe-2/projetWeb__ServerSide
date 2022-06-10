@@ -3,9 +3,9 @@ from sqlalchemy import create_engine
 import numpy as np
 from PIL import Image
 import pymysql
-from time import sleep
+from time import sleep,time
 pymysql.install_as_MySQLdb()
-imgpil = Image.open("triangle.png")
+imgpil = Image.open("degradefunc.png")
 img = np.array(imgpil)  # Transformation de l'image en tableau numpy
 
 print("debut")
@@ -20,6 +20,7 @@ colorsdict = {"hex_code": ["#FFFFFF", "#000000"],
               "id": [6, 5], "name": ["white", "black"]}
 i = 1
 id = 7
+t=time()
 for i, j in enumerate(img):
     # print("a",end="")
     print(".", end="\n")
@@ -40,12 +41,16 @@ for i, j in enumerate(img):
         dict["x_position"].append(k)
         dict["y_position"].append(i)
         i+=1
-
-engine = create_engine('mysql://root:my_secret_password@localhost:3307/app_db')
+print("fin:",time()-t)
+t=time()
 df = pd.DataFrame(dict)
 print(df)
-df.to_sql("pixel", con=engine, if_exists="replace")
 
 df2 = pd.DataFrame(colorsdict)
 print(df2)
-df2.to_sql("color", con=engine, if_exists="replace")
+print("fin2:",time()-t)
+df.to_csv("triangle.csv", index=False)
+df2.to_csv("colors.csv", index=False)
+# engine = create_engine('mysql://root:my_secret_password@localhost:3307/app_db')
+# df.to_sql("pixel", con=engine, if_exists="replace")
+# df2.to_sql("color", con=engine, if_exists="replace")

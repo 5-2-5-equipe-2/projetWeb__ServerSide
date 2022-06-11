@@ -165,33 +165,12 @@ class UserController extends BaseController
                                     $userModel = new userModel();
                                     $queryArgs= self::getRequiredPostArgsOrThrow(array('username','password'), array('string','string'));
                                     $queryArgs2= self::getRequiredPostArgs(array('first_name, surname, email, profile_picture'), array('string','string','string','string'));
-                                    if (in_array('profile_picture', $queryArgs2[1])){
-                                        $queryArgs['profile_picture']=$queryArgs2[0]['profile_picture'];
-                                        
-                                    }
-                                    else {
-                                        $queryArgs['profile_picture']=Null;
-                                    }
-                                    if (in_array('surname', $queryArgs2[1])){
-                                        $queryArgs['surname']=$queryArgs2[0]['surname'];
-                                    }
-                                    else {
-                                        $queryArgs['surname']=Null;
-                                    }
-                                    if (in_array('first_name', $queryArgs2[1])){
-                                        $queryArgs['first_name']=$queryArgs2[0]['first_name'];
-                                    }
-                                    else {
-                                        
-                                        $queryArgs['first_name']=Null;
-                                    }
-                                    if (in_array('email', $queryArgs2[1])){
-                                        $queryArgs['email']=$queryArgs2[0]['email'];
-                                    }
-                                    else {
-                                        
-                                        $queryArgs['email']=Null;
-                                    }
+                                    isset($queryArgs2[0]['first_name']) ? $queryArgs['first_name'] = $queryArgs2[0]['first_name'] : $queryArgs['first_name'] = null;
+                                    isset($queryArgs2[0]['surname']) ? $queryArgs['surname'] = $queryArgs2[0]['surname'] : $queryArgs['surname'] = null;
+                                    isset($queryArgs2[0]['email']) ? $queryArgs['email'] = $queryArgs2[0]['email'] : $queryArgs['email'] = null;
+                                    isset($queryArgs2[0]['profile_picture']) ? $queryArgs['profile_picture'] = $queryArgs2[0]['profile_picture'] : $queryArgs['profile_picture'] = null;
+
+
 
 
 

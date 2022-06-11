@@ -206,6 +206,9 @@ class UserModel extends Database
         );
 
         // if any user with that email does already exist
+        if ($email=='null') {
+            return true;
+        }
         if (count($occurrencesOfEmail) > 0) {
             // cancel the operation and report the violation of this requirement
             throw new UserAlreadyExistException("A user with the email $email already exists");

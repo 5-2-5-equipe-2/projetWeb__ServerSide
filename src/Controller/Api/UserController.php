@@ -158,27 +158,52 @@ class UserController extends BaseController
     public function createUserAction()
     {
         $strErrorDesc = '';
-        $responseData = array();
-        $strErrorHeader = '';
-        $requestMethod = $_SERVER["REQUEST_METHOD"];
-        $arrQueryStringParams = $this->getPOSTData();
+                            $responseData = array();
+                            $strErrorHeader = '';
+                                try {
+                                    $this->isRequestMethodOrThrow('POST');
+                                    $userModel = new userModel();
+                                    $queryArgs= self::getRequiredPostArgsOrThrow(array('username','password'), array('string','string'));
+                                    $queryArgs2= self::getRequiredPostArgs(array('first_name, surname, email, profile_picture'), array('string','string','string','string'));
+                                    if (in_array('profile_picture', $queryArgs2[1])){
+                                        $queryArgs['profile_picture']=$queryArgs2[0]['profile_picture'];
+                                        
+                                    }
+                                    else {
+                                        $queryArgs['profile_picture']=Null;
+                                    }
+                                    if (in_array('surname', $queryArgs2[1])){
+                                        $queryArgs['surname']=$queryArgs2[0]['surname'];
+                                    }
+                                    else {
+                                        $queryArgs['surname']=Null;
+                                    }
+                                    if (in_array('first_name', $queryArgs2[1])){
+                                        $queryArgs['first_name']=$queryArgs2[0]['first_name'];
+                                    }
+                                    else {
+                                        
+                                        $queryArgs['first_name']=Null;
+                                    }
+                                    if (in_array('email', $queryArgs2[1])){
+                                        $queryArgs['email']=$queryArgs2[0]['email'];
+                                    }
+                                    else {
+                                        
+                                        $queryArgs['email']=Null;
+                                    }
 
-        if (strtoupper($requestMethod) == 'POST') {
-            try {
-                $userManager = new UserManager();
-                $userManager->createUser($arrQueryStringParams['username'], $arrQueryStringParams['password']);
-                $responseData = json_encode(array('success' => 'User created'));
-            } catch (Exception $e) {
-                self::treatBasicExceptions($e);
-            }
-        } else {
-            $strErrorDesc = 'Method not supported';
-            $strErrorHeader = 'HTTP/1.1 422 Unprocessable Entity';
-        }
 
-        // send output
-        self::sendData($strErrorDesc, $strErrorHeader, $responseData);
-    }
+
+                                    
+                                    $arrUsers = $userModel->createuser($queryArgs['username'],$queryArgs['password'],$queryArgs['first_name'],$queryArgs['surname'],$queryArgs['email'],$queryArgs['profile_picture']);
+                                    $responseData = json_encode($arrUsers);
+                                
+                                } catch (Exception $e) {
+                                    self::treatBasicExceptions($e);
+                                }
+                                self::sendData($strErrorDesc, $strErrorHeader, $responseData);
+                            }
 
     /**
      * Login the user with POST method

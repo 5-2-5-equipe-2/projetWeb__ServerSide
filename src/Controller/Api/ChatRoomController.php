@@ -111,7 +111,12 @@
                                     $this->isRequestMethodOrThrow('GET');
                                     $chatRoomModel = new chatRoomModel();
                                     $queryArgs= self::getRequiredGetArgsOrThrow(array('chatRoomName','ownerId'), array('string','number'));
-                                    $arrChatRooms = $chatRoomModel->createChatRoom($queryArgs['chatRoomName'], $queryArgs['ownerId']);
+                                    $queryArgs2= self::getRequiredGetArgs(array('picture'), array('string'));
+                                    if (count($queryArgs2[1])==1){
+                                        $queryArgs['picture'] = Null;}
+                                    else {$queryArgs['picture'] = $queryArgs2[0]['picture'];}
+                                    
+                                    $arrChatRooms = $chatRoomModel->createChatRoom($queryArgs['chatRoomName'], $queryArgs['ownerId'], $queryArgs['picture']);
                                     $responseData = json_encode($arrChatRooms);
                                 
                                 } catch (Exception $e) {

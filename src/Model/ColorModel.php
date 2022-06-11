@@ -36,74 +36,6 @@
         }
 
         /**
-         * Get all colors
-         *
-         * @return array
-         * @throws DatabaseError
-         */
-        public function getColors($limit): array
-        {
-            return $this->select("SELECT 
-                                            {$this->getSafeFields()}
-                                        FROM 
-                                            color
-                                        ORDER BY 
-                                            id
-                                        LIMIT $limit");
-        }
-
-        /**
-         * Get a color by their ID
-         * @param $id int The ID of the color to get
-         * @return array The color details
-         * @throws DatabaseError
-         */
-        public function getColorById(int $id): array
-        {
-            return $this->select("SELECT 
-                                            {$this->getSafeFields()}
-                                        FROM 
-                                            color 
-                                        WHERE 
-                                            id = ?",
-                ["i", $id]);
-        }
-
-        /**
-         * Get a color by their name
-         * @param $name string The name of the color to get
-         * @return array The color details
-         * @throws DatabaseError
-         */
-        public function getColorByName(string $name): array
-        {
-            return $this->select("SELECT 
-                                            {$this->getSafeFields()}
-                                        FROM 
-                                            color 
-                                        WHERE 
-                                            name = ?",
-                ["s", $name]);
-        }
-
-        /**
-         * Get a color by their hex code
-         * @param $hexCode string The hex code of the color to get
-         * @return array The color details
-         * @throws DatabaseError
-         */
-        public function getColorByHexCode(string $hexCode): array
-        {
-            return $this->select("SELECT 
-                                            {$this->getSafeFields()}
-                                        FROM 
-                                            color 
-                                        WHERE 
-                                            hex_code = ?",
-                ["s", $hexCode]);
-        }
-
-        /**
          * Create a new color
          * @param $name string The name of the color
          * @param $hexCode string The hex code of the color
@@ -144,11 +76,11 @@
                 throw new DatabaseError("Invalid hex code");
             }
             // check if color already exists
-            $color = $this->getColorByName($name);
+            $color = $this->get(array("name",$name));
             if (count($color) > 0) {
                 throw new DatabaseError("Color already exists");
             }
-            $color = $this->getColorByHexCode($hexCode);
+            $color = $this->get(array("hex_code",$hexCode));
             if (count($color) > 0) {
                 throw new DatabaseError("Color already exists");
             }

@@ -84,7 +84,7 @@
                             }
                             self::sendData($strErrorDesc, $strErrorHeader, $responseData);
                         }
-    
+
 
                     public function getChatRoomByNameAction(){
                         $strErrorDesc = '';

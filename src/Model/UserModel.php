@@ -460,10 +460,10 @@ class UserModel extends Database
         if ($userManager->getLoggedInUserId() != $userId) {
             throw new NotAuthorizedException();
         }
+        $chatRoomModel = new ChatRoomModel();
         $data = $this->select("
                                         SELECT 
-                                            chat_room.id,
-                                            chat_room.name
+                                            {$chatRoomModel->getSafeFields()}                                          
                                         FROM chat_room
                                         INNER JOIN chat_room_user
                                         ON chat_room.id = chat_room_user.chat_room_id

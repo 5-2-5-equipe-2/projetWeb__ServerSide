@@ -104,7 +104,7 @@
                                             AND y_position >= ?
                                             AND y_position <= ?
                                             AND last_updated >= ?",
-                ["iiiis", $x1, $x2, $y1, $y2,$date]);
+                ["iiiis", $x1, $x2, $y1, $y2, $date]);
         }
 
 
@@ -170,6 +170,36 @@
                                                  number_of_times_placed) 
                                             VALUES (?, ?, ?, ?, NOW(), 1)", ["iiii", $x, $y, $color_id, $user_id]);
         }
+
+        /**
+         * Get all pixels in a rectangle and return a 2D array of the pixels
+         *
+         *
+         * @param int $x1 The x position of the top left corner
+         * @param int $y1 The y position of the top left corner
+         * @param int $x2 The x position of the bottom right corner
+         * @param int $y2 The y position of the bottom right corner
+         * @return array
+         * @throws DatabaseError
+         */
+        public function getPixelsInRectangleAsArray(int $x1, int $y1, int $x2, int $y2): array
+        {
+            $pixels = $this->getPixelsInRectangle($x1, $y1, $x2, $y2);
+            $pixelsArray = [];
+            foreach ($pixels as $pixel) {
+                $pixelsArray[$pixel["x_position"]][$pixel["y_position"]] = $pixel;
+            }
+            // convert the array to a 2D array
+            $pixelsArray = array_map(function ($row) {
+                return array_values($row);
+            }, $pixelsArray);
+            $finalArray = [];
+            foreach ($pixelsArray as $row) {
+                $finalArray[] = array_values($row);
+            }
+            return $finalArray;
+        }
+
 
         public function makeUserIdNull(int $pixelId): int
         {

@@ -2,6 +2,7 @@
 
     namespace Managers;
 
+    use Auth\Exceptions\AttributeDoesNotExistException;
     use Auth\Exceptions\InvalidEmailException;
     use Auth\Exceptions\InvalidPasswordException;
     use Auth\Exceptions\NotAuthorizedException;
@@ -143,10 +144,19 @@
             isset($args["profilePicture"]) ? $profilePicture = $args["profilePicture"] : $profilePicture = null;
             $this->userModel->updateUser($id,$username,$firstname,$surname,$email,$profilePicture);
         }
+
+        /**
+         * @throws AttributeDoesNotExistException
+         * @throws NotAuthorizedException
+         * @throws InvalidPasswordException
+         * @throws UserDoesNotExistException
+         * @throws NotLoggedInException
+         * @throws DatabaseError
+         */
         public function updatePassword(...$args): void
         {
             $id=$this->getLoggedInUserId();
-            $this->userModel->updatePassword($id,$args[0]["password"]);
+            $this->userModel->updatePassword($id,$args[0]["oldPassword"],$args[0]["password"]);
         }
         /**
          * Check if the user is logged in

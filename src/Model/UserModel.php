@@ -4,6 +4,7 @@ namespace Models;
 
 require_once PROJECT_ROOT_PATH . 'Model/Database.php';
 
+use Auth\Exceptions\AttributeDoesNotExistException;
 use Auth\Exceptions\InvalidEmailException;
 use Auth\Exceptions\InvalidPasswordException;
 use Auth\Exceptions\NotLoggedInException;
@@ -382,12 +383,18 @@ class UserModel extends Database
      * @throws UserDoesNotExistException If the user does not exist
      * @throws NotAuthorizedException If the user is not authorized to update the user
      * @throws DatabaseError
+     * @throws AttributeDoesNotExistException
      */
-    public function updatePassword(int $userId, string $password): void
+    public function updatePassword(int $userId,string $oldPassword, string $password): void
     {
         $userManager = new UserManager();
         if ($userManager->getLoggedInUserId() != $userId) {
             throw new NotAuthorizedException();
+        }
+        $this->validatePassword($password);
+        $user = $this->get(array("id",$userId));
+        if (!password_verify($oldPassword, $user["password"])) {
+            throw new InvalidPasswordException("Old password is incorrect");
         }
         if ($this->validatePassword($password)) {
             $updatedRows = $this->update("UPDATE user SET password = ? WHERE id = ?", ["ss", password_hash($password, PASSWORD_BCRYPT), $userId]);

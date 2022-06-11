@@ -116,10 +116,11 @@
             try {
                 $this->isRequestMethodOrThrow('POST');
                 $chatRoomModel = new chatRoomModel();
-                $queryArgs = self::getRequiredPostArgsOrThrow(array('name', 'ownerId', 'description', 'isPrivate'), array('string', 'number', 'string', 'number'));
-
-
-                $arrChatRooms = $chatRoomModel->createChatRoom($queryArgs['name'], $queryArgs['ownerId'], $queryArgs['description'], $queryArgs['isPrivate']);
+                $queryArgs = self::getRequiredPostArgsOrThrow(array('name', 'ownerId', 'isPrivate'), array('string', 'number', 'number'));
+                $queryArgs2= self::getRequiredPostArgs(array('description', 'profile_picture'), array('string','string'));
+                isset($queryArgs2[0]['description']) ? $queryArgs['description'] = $queryArgs2[0]['description'] : $queryArgs['description'] = null;
+                isset($queryArgs2[0]['profile_picture']) ? $queryArgs['profile_picture'] = $queryArgs2[0]['profile_picture'] : $queryArgs['profile_picture'] = null;
+                $arrChatRooms = $chatRoomModel->createChatRoom($queryArgs['name'], $queryArgs['ownerId'], $queryArgs['description'], $queryArgs['isPrivate'], $queryArgs['profile_picture']);
                 $responseData = json_encode($arrChatRooms);
 
             } catch (Exception $e) {
@@ -164,5 +165,42 @@
             self::sendData($strErrorDesc, $strErrorHeader, $responseData);
         }
 
+        public function addUserToChatRoomAction()
+        {
+            $strErrorDesc = '';
+            $responseData = array();
+            $strErrorHeader = '';
+            try {
+                $this->isRequestMethodOrThrow('PUT');
+                $chatRoomModel = new chatRoomModel();
+                $queryArgs = self::getRequiredPutArgsOrThrow(array('chatRoomId', 'userId'), array('number', 'number'));
+                $arrChatRooms = $chatRoomModel->addUserToChatRoom($queryArgs['chatRoomId'], $queryArgs['userId']);
+                $responseData = json_encode($arrChatRooms);
 
+            } catch (Exception $e) {
+                self::treatBasicExceptions($e);
+            }
+            self::sendData($strErrorDesc, $strErrorHeader, $responseData);
+        }
+
+        public function searchPublicChatRoomAction()
+        {
+            $strErrorDesc = '';
+            $responseData = array();
+            $strErrorHeader = '';
+            try {
+                $this->isRequestMethodOrThrow('GET');
+                $chatRoomModel = new chatRoomModel();
+                $queryArgs = self::getRequiredGetArgsOrThrow(array('query'), array('string'));
+                $queryArgs2= self::getRequiredGetArgs(array('limit'), array('number'));
+                isset($queryArgs2[0]['limit']) ? $queryArgs['limit'] = $queryArgs2[0]['limit'] : $queryArgs['limit'] = 10;
+                $arrChatRooms = $chatRoomModel->searchPublicChatRoom($queryArgs['query'],$queryArgs['limit']);
+                $responseData = json_encode($arrChatRooms);
+
+            } catch (Exception $e) {
+                self::treatBasicExceptions($e);
+            }
+            self::sendData($strErrorDesc, $strErrorHeader, $responseData);
+        }
+        
     }

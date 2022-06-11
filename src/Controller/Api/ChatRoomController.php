@@ -202,5 +202,23 @@
             }
             self::sendData($strErrorDesc, $strErrorHeader, $responseData);
         }
+
+        public function updateUsersActions()
+        {
+            $strErrorDesc = '';
+            $responseData = array();
+            $strErrorHeader = '';
+            try {
+                $this->isRequestMethodOrThrow('PUT');
+                $chatRoomModel = new chatRoomModel();
+                $queryArgs = self::getRequiredPutArgsOrThrow(array('chatRoomId', 'userId'), array('number', 'number'));
+                $arrChatRooms = $chatRoomModel->updateUsers($queryArgs['chatRoomId'], $queryArgs['userId']);
+                $responseData = json_encode($arrChatRooms);
+
+            } catch (Exception $e) {
+                self::treatBasicExceptions($e);
+            }
+            self::sendData($strErrorDesc, $strErrorHeader, $responseData);
+        }
         
     }

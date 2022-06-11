@@ -138,12 +138,12 @@
          * @return array The chat room
          * @throws Exception If the chat room does not exist
          */
-        public function createChatRoom(string $chatRoomName, int $ownerId,string $description= null, bool $isPrivate ,string $picture= null): int
+        public function createChatRoom(string $chatRoomName, int $ownerId,string $description= null, int $isPrivate ,string $picture= null): int
         {
             $a =$this->insert("INSERT INTO 
                                         chat_room (name, owner_id,created_at, description, is_private ,profile_picture)
                                         VALUES (?, ?, NOW(), ?, ?, ?)
-                                        ", ["sisss", $chatRoomName, $ownerId, $description, $isPrivate, $picture]);
+                                        ", ["sisis", $chatRoomName, $ownerId, $description, $isPrivate, $picture]);
             $this->addUserToChatRoom($a,$ownerId);
             return $a;
         }
@@ -218,4 +218,17 @@
 
         return $data;
     }
+
+    public function updateUsers(int $chatRoomId, array $users): bool
+    {
+        foreach ($users as $user) {
+            $a=$this->select("SELECT user_id FROM chat_room_user
+                                        WHERE chat_room_id = ?
+                                        ", ["i", $chatRoomId]);
+            if(!in_array($user,$a)){
+            $this->addUserToChatRoom($chatRoomId, $user);
+        }
+        return true;
+    }
+}
 }

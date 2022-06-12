@@ -191,11 +191,16 @@
 
         public function addUserToChatRoom( int $chatRoomId,int $userId): bool
         {
+            $a=$this->select("SELECT user_id FROM chat_room_user
+                                        WHERE chat_room_id = ?
+                                        ", ["i", $chatRoomId]);
+            if(!in_array($userId,$a)){
             return $this->insert("INSERT INTO 
                                         chat_room_user (user_id, chat_room_id)
                                         VALUES (?, ?)
                                         ", ["ii", $userId, $chatRoomId]);
         }
+    }
 
         public function searchPublicChatRoom(string $search, int $limit = 10): array
     {
@@ -221,10 +226,10 @@
 
     public function updateUsers(int $chatRoomId, array $users): bool
     {
-        foreach ($users as $user) {
-            $a=$this->select("SELECT user_id FROM chat_room_user
+        $a=$this->select("SELECT user_id FROM chat_room_user
                                         WHERE chat_room_id = ?
                                         ", ["i", $chatRoomId]);
+        foreach ($users as $user) {
             if(!in_array($user,$a)){
             $this->addUserToChatRoom($chatRoomId, $user);
         }

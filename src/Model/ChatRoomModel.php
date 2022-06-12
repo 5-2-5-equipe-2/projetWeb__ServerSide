@@ -226,10 +226,10 @@
 
     public function updateUsers(int $chatRoomId, array $users): bool
     {
-        foreach ($users as $user) {
-            $a=$this->select("SELECT user_id FROM chat_room_user
+        $a=$this->select("SELECT user_id FROM chat_room_user
                                         WHERE chat_room_id = ?
                                         ", ["i", $chatRoomId]);
+        foreach ($users as $user) {
             if(!in_array($user,$a)){
             $this->addUserToChatRoom($chatRoomId, $user);
         }

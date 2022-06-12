@@ -2,8 +2,6 @@
 
 namespace Controllers;
 
-use Auth\Exceptions\NotLoggedInException;
-use Auth\Exceptions\WrongCredentialsException;
 use Exception;
 use Models\PixelModel;
 use Models\UserModel;

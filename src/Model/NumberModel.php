@@ -4,8 +4,6 @@ namespace Models;
 
 require_once PROJECT_ROOT_PATH . 'Model/Database.php';
 
-use Auth\Exceptions\PixelAlreadyExistException;
-use Database\Exceptions\DatabaseError;
 use Exception;
 use Models\UserModel;
 

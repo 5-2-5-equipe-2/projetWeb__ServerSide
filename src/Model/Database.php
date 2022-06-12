@@ -5,7 +5,6 @@ namespace Models;
 
 use Database\Exceptions\DatabaseError;
 use Auth\Exceptions\AttributeDoesNotExistException;
-use Auth\Exceptions\ElementDoesNotExistException;
 use mysqli;
 use mysqli_stmt;
 
@@ -224,7 +223,7 @@ abstract class Database
     {
         $query = "SELECT {$this->getSafeFields()} FROM {$this->TABLE} WHERE ";
         $arr = [""];
-        
+
         if (count($parameters) > 0) {
 
             foreach ($parameters as $key => $value) {

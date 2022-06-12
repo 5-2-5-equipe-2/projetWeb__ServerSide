@@ -2,10 +2,7 @@
 
 namespace Controllers;
 
-use Auth\Exceptions\NotLoggedInException;
-use Auth\Exceptions\WrongCredentialsException;
 use Exception;
-// use Managers\PixelManager;
 use Models\NumberModel;
 
 class NumberController extends BaseController
@@ -23,7 +20,7 @@ class NumberController extends BaseController
         try {
             $this->isRequestMethodOrThrow('GET');
             $numberModel = new NumberModel();
-            $queryArgs = self::getRequiredGetArgsOrThrow(array('number','user_id'), array('number','number'));
+            $queryArgs = self::getRequiredGetArgsOrThrow(array('number', 'user_id'), array('number', 'number'));
             $arrNumbers = $numberModel->GuessNumber($queryArgs['number'], $queryArgs['user_id']);
             $responseData = json_encode($arrNumbers);
         } catch (Exception $e) {

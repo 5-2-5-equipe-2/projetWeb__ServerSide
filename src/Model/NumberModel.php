@@ -4,8 +4,6 @@ namespace Models;
 
 require_once PROJECT_ROOT_PATH . 'Model/Database.php';
 
-use Auth\Exceptions\PixelAlreadyExistException;
-use Database\Exceptions\DatabaseError;
 use Exception;
 use Models\UserModel;
 
@@ -24,14 +22,13 @@ class NumberModel extends Database   // en fait pas nécessaire car pas de table
             "guess_the_number.number_of_times_tried",
             "guess_the_number.min_value",
             "guess_the_number.max_value",
+            "guess_the_number.number_to_find",
         ];
     }
 
     protected function generateFields(): array
     {
-        $arr = json_decode(json_encode($this->generateSafeFields()));
-        $arr[] = "guess_the_number.number_to_find";
-        return $arr;
+        return $this->generateSafeFields();
     }
 
     protected function generateTypes(): array
@@ -53,14 +50,15 @@ class NumberModel extends Database   // en fait pas nécessaire car pas de table
     protected function generateNumber(): void
     {
         if ($this->isGenerated) {
-            $this->number_real = rand(1, 10000000000000);
+            $this->number_real = rand(1, 9999999);
             $this->number_of_times_tried = 0;
             $this->lowerLimit = 1;
-            $this->upperLimit = 10000000000000;
+            $this->upperLimit = 9999999;
             //update in database
-            $this->update("UPDATE guess_the_number SET number_to_find = ?, number_of_times_tried = ?, min_value = ?, max_value = ? WHERE id = ?", ["iiiii", $this->number_real, $this->number_of_times_tried, $this->lowerLimit, $this->upperLimit, $this->id]);
+            $this->update("UPDATE guess_the_number SET number_to_find = ?, number_of_times_tried = ?, min_value = ?, max_value = ? WHERE id = 1", ["iiii", $this->number_real, $this->number_of_times_tried, $this->lowerLimit, $this->upperLimit]);
         } else {
             $arr = $this->get([], 1);
+            print_r($arr);
             $this->number_real = $arr[0]['number_to_find'];
             $this->number_of_times_tried = $arr[0]['number_of_times_tried'];
             $this->lowerLimit = $arr[0]['min_value'];
@@ -74,7 +72,7 @@ class NumberModel extends Database   // en fait pas nécessaire car pas de table
             $this->upperLimit = $newUpperLimit;
         }
         //update in database
-        $this->update("UPDATE guess_the_number SET max_value = ? WHERE id = ?", ["ii", $this->upperLimit, $this->id]);
+        $this->update("UPDATE guess_the_number SET max_value = ? WHERE id = 1", ["i", $this->upperLimit]);
     }
 
     protected function setLowerLimit(int $newLowerLimit): void
@@ -83,14 +81,14 @@ class NumberModel extends Database   // en fait pas nécessaire car pas de table
             $this->lowerLimit = $newLowerLimit;
         }
         //update in database
-        $this->update("UPDATE guess_the_number SET min_value = ? WHERE id = ?", ["ii", $this->lowerLimit, $this->id]);
+        $this->update("UPDATE guess_the_number SET min_value = ? WHERE id = 1", ["i", $this->lowerLimit]);
     }
 
     protected function incrementNumberOfTries(): void
     {
         $this->number_of_times_tried++;
         //update in database
-        $this->update("UPDATE guess_the_number SET number_of_times_tried = ? WHERE id = ?", ["ii", $this->number_of_times_tried, $this->id]);
+        $this->update("UPDATE guess_the_number SET number_of_times_tried = ? WHERE id = 1", ["i", $this->number_of_times_tried]);
     }
 
     /**
@@ -102,6 +100,9 @@ class NumberModel extends Database   // en fait pas nécessaire car pas de table
      */
     public function guessNumber(int $number, int $user_id): array
     {
+        if (!$this->isGenerated) {
+            $this->generateNumber();
+        }
         $arr = array();
         $number_real = $this->number_real;
         if ($number_real == $number) {

@@ -2,10 +2,9 @@
 
 namespace Controllers;
 
-use Auth\Exceptions\NotLoggedInException;
-use Auth\Exceptions\WrongCredentialsException;
 use Exception;
 use Models\PixelModel;
+use Models\UserModel;
 
 class PixelController extends BaseController
 {
@@ -74,7 +73,19 @@ class PixelController extends BaseController
             $this->isRequestMethodOrThrow('PUT');
             $pixelModel = new PixelModel();
             $queryArgs = self::getRequiredPutArgsOrThrow(array('x', 'y', 'color_id', 'user_id'), array('number', 'number', 'number', 'number'));
-            $arrPixels = $pixelModel->updatePixel($queryArgs['x'], $queryArgs['y'], $queryArgs['color_id'], $queryArgs['user_id']);
+            $userModel = new UserModel();
+            $user = $userModel->get(array("id" => $queryArgs['user_id']))[0];
+            if ($user["free_pixels"] > 0) {
+                $arrPixels = $pixelModel->updatePixel($queryArgs['x'], $queryArgs['y'], $queryArgs['color_id'], $queryArgs['user_id']);
+                $userModel->decreaseFreePixels($queryArgs['user_id']);
+            } else {
+                if ($user["next_time_pixel"] < time()) {
+                    $pixelModel->updatePixel($queryArgs['x'], $queryArgs['y'], $queryArgs['color_id'], $queryArgs['user_id']);
+                    $arrPixels = $userModel->setTimeForNextPixel($queryArgs['user_id']);
+                } else {
+                    $arrPixels = "You can't update pixel now. You have to wait some seconds";
+                }
+            }
             $responseData = json_encode($arrPixels);
         } catch (Exception $e) {
             self::treatBasicExceptions($e);

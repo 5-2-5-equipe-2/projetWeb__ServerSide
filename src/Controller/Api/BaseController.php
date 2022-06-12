@@ -86,7 +86,6 @@ abstract class BaseController
 
     /**
      * Send API output.
-     *
      * @param string $data
      * @param array $httpHeaders
      */
@@ -307,15 +306,17 @@ abstract class BaseController
 
         try {
             $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_QUERY);
-            $parameters = explode("&", $uri);
             $art = [];
-            $limit=50;
-            foreach ($parameters as $value) {
-                $s = explode("=", $value);
-                if (strcmp($s[0], "limit") == 0) {
-                    $limit = $s[1];
-                } else {
-                    $art[$s[0]] = $s[1];
+            $limit = 50;
+            if ($uri) {
+                $parameters = explode("&", $uri);
+                foreach ($parameters as $value) {
+                    $s = explode("=", $value);
+                    if (strcmp($s[0], "limit") == 0) {
+                        $limit = $s[1];
+                    } else {
+                        $art[$s[0]] = $s[1];
+                    }
                 }
             }
 
@@ -346,8 +347,7 @@ abstract class BaseController
             list($queryArgs, $queryErrors) = self::getRequiredGetArgs(array('limit'), array('number'));
             if (count($queryErrors) == 0) {
                 $intLimit = $queryArgs['limit'];
-            }
-            else {
+            } else {
                 $intLimit = 50;
             }
             $arr = $Model->get([], $intLimit);

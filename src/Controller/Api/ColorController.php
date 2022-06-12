@@ -2,10 +2,7 @@
 
 namespace Controllers;
 
-use Auth\Exceptions\NotLoggedInException;
-use Auth\Exceptions\WrongCredentialsException;
 use Exception;
-use Managers\ColorManager;
 use Models\ColorModel;
 
 class ColorController extends BaseController

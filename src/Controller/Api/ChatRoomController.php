@@ -203,7 +203,7 @@
             self::sendData($strErrorDesc, $strErrorHeader, $responseData);
         }
 
-        public function updateUsersActions()
+        public function updateUsersAction()
         {
             $strErrorDesc = '';
             $responseData = array();
@@ -221,7 +221,7 @@
             self::sendData($strErrorDesc, $strErrorHeader, $responseData);
         }
 
-        public function updateChatRoomActions()
+        public function updateChatRoomAction()
         {
             $strErrorDesc = '';
             $responseData = array();

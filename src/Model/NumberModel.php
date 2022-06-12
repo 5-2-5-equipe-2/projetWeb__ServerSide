@@ -10,6 +10,7 @@ use Exception;
 
 class NumberModel extends Database
 {
+    protected int $number_real;
 
     protected function generateSafeFields(): array
     {
@@ -31,16 +32,42 @@ class NumberModel extends Database
     protected function generateTypes(): array
     {
         return array(
-            "pixel.id" => "i",
-            "guess_the_number.id",
-            "guess_the_number.number_of_times_tried",
-            "guess_the_number.min_value",
-            "guess_the_number.max_value",        );
+            "guess_the_number.id"=>"i",
+            "guess_the_number.number_of_times_tried" => "i",
+            "guess_the_number.min_value" => "i",
+            "guess_the_number.max_value" => "i",
+            "guess_the_number.number_to_find" => "i"
+            );
     }
 
     protected function generateTable(): string
     {
-        return "pixel";
+        return "guess_the_number";
+    }
+
+
+    /**
+     * Attempt to guess the number
+     * @param int $number
+     * @param int $user_id
+     * @return array
+     * @throws Exception
+     */
+    public function guessNumber(int $number, int $user_id): array
+    {
+        $arr = array();
+        $number_real=$this->number_real;
+        if ($number_real==$number) {
+            $arr['status'] = 'success';
+            $arr['message'] = 'You guessed the number! You won 10 pixels!';
+        } else if ($number_real>$number) {
+            $arr['status'] = 'higher';
+            $arr['message'] = 'The number is higher than '.$number;
+        } else {
+            $arr['status'] = 'lower';
+            $arr['message'] = 'The number is lower than '.$number;
+        }
+        return $arr;
     }
 
     /**

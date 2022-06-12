@@ -81,13 +81,13 @@ class PixelController extends BaseController
                 $pixelModel->updatePixel($queryArgs['x'], $queryArgs['y'], $queryArgs['color_id'], $queryArgs['user_id']);
                 $userModel->decreaseFreePixels($queryArgs['user_id']);
             } else {
-                if ($user["time_next_pixel"] < time()) {
+                if ($user["next_time_pixel"] < time()) {
                     $pixelModel->updatePixel($queryArgs['x'], $queryArgs['y'], $queryArgs['color_id'], $queryArgs['user_id']);
                     $arrPixels = $userModel->setTimeForNextPixel($queryArgs['user_id']);
+                } else {
+                    $arrPixels = "You can't update pixel now. You have to wait " . ($user["next_time_pixel"] - time()) . " seconds";
                 }
-            else {
-                $arrPixels = "You can't update pixel now. You have to wait " . ($user["time_next_pixel"] - time()) . " seconds";
-            }}
+            }
             $responseData = json_encode($arrPixels);
         } catch (Exception $e) {
             self::treatBasicExceptions($e);

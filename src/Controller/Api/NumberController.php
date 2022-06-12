@@ -27,7 +27,6 @@ class NumberController extends BaseController
             $arrNumbers = $numberModel->GuessNumber($queryArgs['number'], $queryArgs['user_id']);
             $responseData = json_encode($arrNumbers);
         } catch (Exception $e) {
-            echo "dsf";
             self::treatBasicExceptions($e);
         }
         self::sendData($strErrorDesc, $strErrorHeader, $responseData);

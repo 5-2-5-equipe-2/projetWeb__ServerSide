@@ -220,5 +220,26 @@
             }
             self::sendData($strErrorDesc, $strErrorHeader, $responseData);
         }
-        
+
+        public function updateChatRoomActions()
+        {
+            $strErrorDesc = '';
+            $responseData = array();
+            $strErrorHeader = '';
+            try {
+                $this->isRequestMethodOrThrow('PUT');
+                $chatRoomModel = new chatRoomModel();
+                $queryArgs = self::getRequiredPutArgsOrThrow(array('chatRoomId','name', 'ownerId', 'isPrivate'), array('number','string', 'number', 'number'));
+                $queryArgs2= self::getRequiredPutArgs(array('description', 'profile_picture'), array('string','string'));
+                isset($queryArgs2[0]['description']) ? $queryArgs['description'] = $queryArgs2[0]['description'] : $queryArgs['description'] = null;
+                isset($queryArgs2[0]['profile_picture']) ? $queryArgs['profile_picture'] = $queryArgs2[0]['profile_picture'] : $queryArgs['profile_picture'] = null;
+                $arrChatRooms = $chatRoomModel->updateChatRoom($queryArgs['name'], $queryArgs['ownerId'], $queryArgs['description'], $queryArgs['isPrivate'], $queryArgs['profile_picture']);
+                $responseData = json_encode($arrChatRooms);
+
+            } catch (Exception $e) {
+                self::treatBasicExceptions($e);
+            }
+            self::sendData($strErrorDesc, $strErrorHeader, $responseData);
+        }
+
     }

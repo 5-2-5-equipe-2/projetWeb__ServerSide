@@ -232,8 +232,41 @@
         foreach ($users as $user) {
             if(!in_array($user,$a)){
             $this->addUserToChatRoom($chatRoomId, $user);
-        }
+            }
         return true;
+        }
     }
-}
-}
+
+    public function updateChatRoom(int $chatRoomId, string $chatRoomName=null, string $description=null, int $isPrivate=0, string $picture=null): bool
+        {
+
+            $fields = "";
+            $params = [""];
+            if ($chatRoomName !== null) {
+                $fields .= "chatRoomName = ?,";
+                $params[] = $chatRoomName;
+                $params[0] = $params[0] . "s";
+            }
+            if ($description !== null) {
+                $fields .= "description = ?,";
+                $params[] = $description;
+                $params[0] = $params[0] . "s";
+            }
+            if ($isPrivate !== 0) {
+                $fields .= "isPrivate = ?,";
+                $params[] = $isPrivate;
+                $params[0] = $params[0] . "s";
+            }
+            if ($picture !== null) {
+                $fields .= "profile_picture = ?,";
+                $params[] = $picture;
+                $params[0] = $params[0] . "s";
+            }
+            $fields = substr($fields, 0, -1);
+            $params[0] = $params[0] . "i";
+            $params[] = $chatRoomId;
+            $rowsUpdated = $this->update("UPDATE chatRoom SET " . $fields . " WHERE id = ?", $params);
+            return $chatRoomId;
+        }
+    }
+

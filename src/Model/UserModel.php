@@ -632,4 +632,23 @@
             }
             return $data;
         }
+
+        /**
+         * set the next_time_pixel to now+5 minutes
+         */
+        
+        public function setTimeForNextPixel($user_id)
+        {
+            $this->update("UPDATE user SET next_time_pixel = NOW() + INTERVAL 5 MINUTE WHERE id = ?", ["i", $user_id]);
+        }
+
+        /**
+         * decrease free_pixels by 1
+         */
+        public function decreaseFreePixels($user_id)
+        {
+            $this->update("UPDATE user SET free_pixels = free_pixels - 1 WHERE id=?", ["i", $user_id]);
+        }
+
+
     }

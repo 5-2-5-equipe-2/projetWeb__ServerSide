@@ -18,7 +18,7 @@ CREATE TABLE `user`
     `profile_picture` varchar(500),
     `pixels_placed`   int,
     `next_time_pixel` datetime,
-    `free_pixels`     int
+    `free_pixels`     int DEFAULT 0
 );
 
 CREATE TABLE `chat_room`
@@ -319,6 +319,9 @@ INSERT INTO `games_soluce` (`id`, `game_code`, `soluce`)
 VALUES (5, 3, 'test3');
 INSERT INTO `games_soluce` (`id`, `game_code`, `soluce`)
 VALUES (6, 3, 'tezt');
+
+INSERT INTO `guess_the_number` (`id`, `number_to_find`, `number_of_times_tried`, `min_value`, `max_value`)
+VALUES (1, 3246578, 0, 1, 9999999);
 
 
 

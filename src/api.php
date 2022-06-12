@@ -7,6 +7,7 @@
     use Controllers\PixelController;
     use Controllers\GameController;
     use Controllers\ColorController;
+    use Controllers\NumberController;
 
     require __DIR__ . "/inc/bootstrap.php";
 
@@ -53,7 +54,11 @@
                 $gameController->{$uri[3] . 'Action'}();
                 break;
             case 'color':
-                $gameController = new ColorController();
+                $colorController = new ColorController();
+                $colorController->{$uri[3] . 'Action'}();
+                break;
+            case 'number':
+                $gameController = new NumberController();
                 $gameController->{$uri[3] . 'Action'}();
                 break;
             default:

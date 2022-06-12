@@ -159,7 +159,6 @@ abstract class Database
 
     /**
      * Deletes a row from the database.
-     *
      * @param string $query
      * @param array $params
      * @return int

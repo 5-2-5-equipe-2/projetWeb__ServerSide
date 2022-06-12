@@ -14,7 +14,8 @@ CREATE TABLE `user`
     `is_super_user`   boolean,
     `profile_picture` varchar(500),
     `pixels_placed`   int,
-    `next_time_pixel` datetime
+    `next_time_pixel` datetime,
+    `free_pixels`     int
 );
 
 CREATE TABLE `chat_room`
@@ -106,11 +107,19 @@ CREATE TABLE `games_soluce` (
   `soluce` text
 );
 
-CREATE TABLE `files` (
-  `id` int(11) NOT NULL,
-  `url` varchar(500),
-  `size` int
-);
+CREATE TABLE `guess_the_number` {
+    `id` integer PRIMARY KEY AUTO_INCREMENT,
+    `number_to_find` int(11) NOT NULL,
+    `number_of_times_tried` integer NOT NULL
+    `min_value` int(11) DEFAULT NULL,
+    `max_value` int(11) DEFAULT NULL
+}
+
+-- CREATE TABLE `files` (
+--   `id` int(11) NOT NULL,
+--   `url` varchar(500),
+--   `size` int
+-- );
 
 
 ALTER TABLE `chat_room`

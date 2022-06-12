@@ -5,7 +5,6 @@ namespace Controllers;
 use Auth\Exceptions\NotLoggedInException;
 use Auth\Exceptions\WrongCredentialsException;
 use Exception;
-use Managers\PixelManager;
 use Models\PixelModel;
 
 class PixelController extends BaseController
@@ -153,4 +152,20 @@ class PixelController extends BaseController
         self::sendData($strErrorDesc, $strErrorHeader, $responseData);
     }
 
+    public function getPixelsInRectangleAsArrayAction()
+    {
+        $strErrorDesc = '';
+        $responseData = array();
+        $strErrorHeader = '';
+        try {
+            $this->isRequestMethodOrThrow('GET');
+            $pixelModel = new PixelModel();
+            $queryArgs = self::getRequiredGetArgsOrThrow(array('x1', 'y1', 'x2', 'y2'), array('number', 'number', 'number', 'number'));
+            $arrPixels = $pixelModel->getPixelsInRectangleAsArray($queryArgs['x1'], $queryArgs['y1'], $queryArgs['x2'], $queryArgs['y2']);
+            $responseData = json_encode($arrPixels);
+        } catch (Exception $e) {
+            self::treatBasicExceptions($e);
+        }
+        self::sendData($strErrorDesc, $strErrorHeader, $responseData);
+    }
 }

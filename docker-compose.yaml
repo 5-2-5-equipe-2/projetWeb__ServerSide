@@ -8,6 +8,8 @@ services:
       - "80:80"
     volumes:
       - ./src:/var/www/html
+      - images:/var/www/html/images
+      - images2:/tmp/
     depends_on:
       - db
     links:
@@ -36,10 +38,10 @@ services:
       MYSQL_PASSWORD: db_user_pass
     ports:
       # <Port exposed> : < MySQL Port running inside container>
-      - '3307:3306'
+      - '3337:3306'
     expose:
       # Opens port 3306 on the container
-      - '3306'
+      - '3337'
     volumes:
       - data:/var/lib/mysql
 
@@ -54,11 +56,13 @@ services:
       PMA_ARBITRARY: 1
     restart: always
     ports:
-      - "8082:80"
+      - "8080:80"
     networks:
       # Connects to the network named 'default'
       - default
 volumes:
   data:
+  images:
+  images2:
 
 

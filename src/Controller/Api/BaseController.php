@@ -10,7 +10,7 @@ use JetBrains\PhpStorm\NoReturn;
 
 abstract class BaseController
 {
-    var $MODEL;
+    var Database $MODEL;
 
     /**
      * 
@@ -22,7 +22,7 @@ abstract class BaseController
 
     abstract protected function generateModel(): Database;
 
-    function getModel()
+    function getModel(): Database
     {
         return $this->MODEL;
     }
@@ -344,8 +344,11 @@ abstract class BaseController
             $Model = $this->getModel();
             $intLimit = 10;
             list($queryArgs, $queryErrors) = self::getRequiredGetArgs(array('limit'), array('number'));
-            if (count($queryErrors) != 0) {
+            if (count($queryErrors) == 0) {
                 $intLimit = $queryArgs['limit'];
+            }
+            else {
+                $intLimit = 50;
             }
             $arr = $Model->get([], $intLimit);
             $responseData = json_encode($arr);

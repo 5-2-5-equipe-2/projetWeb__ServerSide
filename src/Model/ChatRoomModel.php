@@ -138,12 +138,14 @@
          * @return array The chat room
          * @throws Exception If the chat room does not exist
          */
-        public function createChatRoom(string $chatRoomName, int $ownerId): int
+        public function createChatRoom(string $chatRoomName, int $ownerId,string $description= null, int $isPrivate ,string $picture= null): int
         {
-            return $this->insert("INSERT INTO 
-                                        chat_room (name, owner_id,created_at)
-                                        VALUES (?, ?, NOW())
-                                        ", ["si", $chatRoomName, $ownerId]);
+            $a =$this->insert("INSERT INTO 
+                                        chat_room (name, owner_id,created_at, description, is_private ,profile_picture)
+                                        VALUES (?, ?, NOW(), ?, ?, ?)
+                                        ", ["sisis", $chatRoomName, $ownerId, $description, $isPrivate, $picture]);
+            $this->addUserToChatRoom($a,$ownerId);
+            return $a;
         }
 
         public function deleteChatRoom(int $chatRoomId): bool
@@ -187,6 +189,46 @@
                                         ", ["ii", $newOwnerId, $chatRoomId]);
         }
 
-       
+        public function addUserToChatRoom( int $chatRoomId,int $userId): bool
+        {
+            return $this->insert("INSERT INTO 
+                                        chat_room_user (user_id, chat_room_id)
+                                        VALUES (?, ?)
+                                        ", ["ii", $userId, $chatRoomId]);
+        }
 
+        public function searchPublicChatRoom(string $search, int $limit = 10): array
+    {
+        $data = $this->select(
+            "
+                                        SELECT 
+                                            {$this->getSafeFields()}
+                                        FROM chat_room
+                                        WHERE chat_room.name LIKE ?
+                                        OR chat_room.description LIKE ?
+                                        AND chat_room.is_private = 0
+                                        ORDER BY chat_room.name
+                                        LIMIT ?",
+            ["ssi", "%" . $search . "%", "%" . $search . "%", $limit]
+        );
+
+        if ($data == null) {
+            return [];
+        }
+
+        return $data;
     }
+
+    public function updateUsers(int $chatRoomId, array $users): bool
+    {
+        foreach ($users as $user) {
+            $a=$this->select("SELECT user_id FROM chat_room_user
+                                        WHERE chat_room_id = ?
+                                        ", ["i", $chatRoomId]);
+            if(!in_array($user,$a)){
+            $this->addUserToChatRoom($chatRoomId, $user);
+        }
+        return true;
+    }
+}
+}

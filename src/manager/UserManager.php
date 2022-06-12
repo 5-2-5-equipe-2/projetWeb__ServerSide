@@ -2,6 +2,7 @@
 
     namespace Managers;
 
+    use Auth\Exceptions\AttributeDoesNotExistException;
     use Auth\Exceptions\InvalidEmailException;
     use Auth\Exceptions\InvalidPasswordException;
     use Auth\Exceptions\NotAuthorizedException;
@@ -134,20 +135,30 @@
          */
         public function updateUser(...$args): void
         {
-            $id=$this->getLoggedInUserId();
-            $args=$args[0];
+            $id = $this->getLoggedInUserId();
+            $args = $args[0];
             isset($args["username"]) ? $username = $args["username"] : $username = null;
             isset($args["email"]) ? $email = $args["email"] : $email = null;
             isset($args["firstname"]) ? $firstname = $args["firstname"] : $firstname = null;
             isset($args["surname"]) ? $surname = $args["surname"] : $surname = null;
             isset($args["profilePicture"]) ? $profilePicture = $args["profilePicture"] : $profilePicture = null;
-            $this->userModel->updateUser($id,$username,$firstname,$surname,$email,$profilePicture);
+            $this->userModel->updateUser($id, $username, $firstname, $surname, $email, $profilePicture);
         }
-        public function updatePassword(...$args): void
+
+        /**
+         * @throws AttributeDoesNotExistException
+         * @throws NotAuthorizedException
+         * @throws InvalidPasswordException
+         * @throws UserDoesNotExistException
+         * @throws NotLoggedInException
+         * @throws DatabaseError
+         */
+        public function updatePassword(string $oldPassword,string $newPassword): void
         {
-            $id=$this->getLoggedInUserId();
-            $this->userModel->updatePassword($id,$args[0]["password"]);
+            $id = $this->getLoggedInUserId();
+            $this->userModel->updatePassword($id, $oldPassword, $newPassword);
         }
+
         /**
          * Check if the user is logged in
          *
@@ -156,6 +167,7 @@
         {
             $this->userModel->deleteUser($args[0]["id"]);
         }
+
         public function isLoggedIn(): bool
         {
             return isset($_SESSION[self::SESSION_FIELD_LOGGED_IN]);

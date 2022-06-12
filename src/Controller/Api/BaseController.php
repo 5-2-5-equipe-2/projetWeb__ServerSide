@@ -10,7 +10,7 @@ use JetBrains\PhpStorm\NoReturn;
 
 abstract class BaseController
 {
-    var $MODEL;
+    var Database $MODEL;
 
     /**
      * 
@@ -22,7 +22,7 @@ abstract class BaseController
 
     abstract protected function generateModel(): Database;
 
-    function getModel()
+    function getModel(): Database
     {
         return $this->MODEL;
     }

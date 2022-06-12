@@ -33,7 +33,8 @@
                 "user.is_super_user",
                 "user.profile_picture",
                 "user.pixels_placed",
-                "user.next_time_pixel"
+                "user.next_time_pixel",
+                "user.free_pixels",
             );
         }
 
@@ -58,6 +59,7 @@
                 "user.profile_picture" => "s",
                 "user.pixels_placed" => "i",
                 "user.next_time_pixel" => "s",
+                "user.free_pixels" => "i",
             );
         }
 
@@ -421,6 +423,16 @@
                     throw new UserDoesNotExistException("User with id $userId does not exist");
                 }
             }
+        }
+
+        /**
+         * update a user: add some free_pixels to the user
+         * @param int $userId The id of the user to update
+         * @param int $freePixels The amount of free_pixels to add to the user
+         */
+        public function addFreePixels(int $userId, int $freePixels): void
+        {
+            $this->update("UPDATE user SET free_pixels = free_pixels + ? WHERE id = ?", ["ii", $freePixels, $userId]);
         }
 
 

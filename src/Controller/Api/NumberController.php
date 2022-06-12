@@ -10,6 +10,7 @@ use Models\NumberModel;
 
 class NumberController extends BaseController
 {
+    protected NumberModel $MODELtest;
     protected function generateModel(): NumberModel
     {
         return new NumberModel();
@@ -22,10 +23,10 @@ class NumberController extends BaseController
         $strErrorHeader = '';
         try {
             $this->isRequestMethodOrThrow('GET');
-            $numberModel = new NumberModel();
+            $numberModel = $this->MODELtest;
             $queryArgs = self::getRequiredGetArgsOrThrow(array('number','user_id'), array('number','number'));
             $arrNumbers = $numberModel->GuessNumber($queryArgs['number'], $queryArgs['user_id']);
-            $responseData = json_encode($response);
+            $responseData = json_encode($arrNumbers);
         } catch (Exception $e) {
             self::treatBasicExceptions($e);
         }

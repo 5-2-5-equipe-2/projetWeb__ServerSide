@@ -7,10 +7,15 @@ require_once PROJECT_ROOT_PATH . 'Model/Database.php';
 use Auth\Exceptions\PixelAlreadyExistException;
 use Database\Exceptions\DatabaseError;
 use Exception;
+use Models\UserModel;
 
-class NumberModel extends Database
+class NumberModel extends Database   // en fait pas nécessaire car pas de table (puisqu'il y en a qu'un seul à garder en direct)
 {
     protected int $number_real;
+    protected int $upperLimit;
+    protected int $lowerLimit;
+    protected int $number_of_times_tried;
+    public bool $isGenerated = false;
 
     protected function generateSafeFields(): array
     {
@@ -32,12 +37,12 @@ class NumberModel extends Database
     protected function generateTypes(): array
     {
         return array(
-            "guess_the_number.id"=>"i",
+            "guess_the_number.id" => "i",
             "guess_the_number.number_of_times_tried" => "i",
             "guess_the_number.min_value" => "i",
             "guess_the_number.max_value" => "i",
             "guess_the_number.number_to_find" => "i"
-            );
+        );
     }
 
     protected function generateTable(): string
@@ -45,6 +50,48 @@ class NumberModel extends Database
         return "guess_the_number";
     }
 
+    protected function generateNumber(): void
+    {
+        if ($this->isGenerated) {
+            $this->number_real = rand(1, 10000000000000);
+            $this->number_of_times_tried = 0;
+            $this->lowerLimit = 1;
+            $this->upperLimit = 10000000000000;
+            //update in database
+            $this->update("UPDATE guess_the_number SET number_to_find = ?, number_of_times_tried = ?, min_value = ?, max_value = ? WHERE id = ?", ["iiiii", $this->number_real, $this->number_of_times_tried, $this->lowerLimit, $this->upperLimit, $this->id]);
+        } else {
+            $arr = $this->get([], 1);
+            $this->number_real = $arr[0]['number_to_find'];
+            $this->number_of_times_tried = $arr[0]['number_of_times_tried'];
+            $this->lowerLimit = $arr[0]['min_value'];
+            $this->upperLimit = $arr[0]['max_value'];
+        }
+    }
+
+    protected function setUpperLimit(int $newUpperLimit): void
+    {
+        if ($newUpperLimit < $this->upperLimit) {
+            $this->upperLimit = $newUpperLimit;
+        }
+        //update in database
+        $this->update("UPDATE guess_the_number SET max_value = ? WHERE id = ?", ["ii", $this->upperLimit, $this->id]);
+    }
+
+    protected function setLowerLimit(int $newLowerLimit): void
+    {
+        if ($newLowerLimit > $this->lowerLimit) {
+            $this->lowerLimit = $newLowerLimit;
+        }
+        //update in database
+        $this->update("UPDATE guess_the_number SET min_value = ? WHERE id = ?", ["ii", $this->lowerLimit, $this->id]);
+    }
+
+    protected function incrementNumberOfTries(): void
+    {
+        $this->number_of_times_tried++;
+        //update in database
+        $this->update("UPDATE guess_the_number SET number_of_times_tried = ? WHERE id = ?", ["ii", $this->number_of_times_tried, $this->id]);
+    }
 
     /**
      * Attempt to guess the number
@@ -56,195 +103,23 @@ class NumberModel extends Database
     public function guessNumber(int $number, int $user_id): array
     {
         $arr = array();
-        $number_real=$this->number_real;
-        if ($number_real==$number) {
+        $number_real = $this->number_real;
+        if ($number_real == $number) {
             $arr['status'] = 'success';
             $arr['message'] = 'You guessed the number! You won 10 pixels!';
-        } else if ($number_real>$number) {
+            $this->generateNumber();
+            //add 10 free_pixels to user
+            $userModel = new UserModel();
+            $userModel->addFreePixels($user_id, 10);
+        } else if ($number_real > $number) {
             $arr['status'] = 'higher';
-            $arr['message'] = 'The number is higher than '.$number;
+            $arr['message'] = 'The number is higher than ' . $number;
+            $this->setLowerLimit($number);
         } else {
             $arr['status'] = 'lower';
-            $arr['message'] = 'The number is lower than '.$number;
+            $arr['message'] = 'The number is lower than ' . $number;
+            $this->setUpperLimit($number);
         }
         return $arr;
-    }
-
-    /**
-     * Get pixels in a rectangle
-     * @param int $x1 The x position of the top left corner
-     * @param int $y1 The y position of the top left corner
-     * @param int $x2 The x position of the bottom right corner
-     * @param int $y2 The y position of the bottom right corner
-     * @return array The pixels in the rectangle
-     * @throws DatabaseError
-     */
-    public function getPixelsInRectangle(int $x1, int $y1, int $x2, int $y2): array
-    {
-        return $this->select(
-            "SELECT 
-                                            {$this->getSafeFields()}
-                                        FROM 
-                                            pixel
-                                        WHERE 
-                                            x_position >= ?
-                                            AND x_position <= ?
-                                            AND y_position >= ?
-                                            AND y_position <= ?",
-            ["iiii", $x1, $x2, $y1, $y2]
-        );
-    }
-
-
-    /**
-     * Get a pixel by their ID
-     * @param $id int The ID of the pixel to get
-     * @return array The pixel details
-     * @throws Exception If the pixel doesn't exist
-     */
-    public function getPixelById(int $id): array
-    {
-        return $this->select(
-            "SELECT 
-                                            *
-                                        FROM 
-                                            pixel 
-                                        WHERE 
-                                            id = ?",
-            ["i", $id]
-        );
-    }
-
-    /**
-     * Get all pixels in a rectangle after a certain datetime
-     * @return array The pixels
-     * @throws Exception
-     **/
-    public function getPixelsInRectangleAfterDate(int $x1, int $y1, int $x2, int $y2, string $date): array
-    {
-        return $this->select(
-            "SELECT 
-                                            {$this->getSafeFields()}
-                                        FROM 
-                                            pixel
-                                        WHERE 
-                                            x_position >= ?
-                                            AND x_position <= ?
-                                            AND y_position >= ?
-                                            AND y_position <= ?
-                                            AND last_updated >= ?",
-            ["iiiis", $x1, $x2, $y1, $y2, $date]
-        );
-    }
-
-
-    /**
-     * modify a pixel at a certain xy position
-     *
-     * @param int $x The x position of the pixel
-     * @param int $y The y position of the pixel
-     * @param int $color_id The color of the pixel
-     * @param int $user_id The user who placed the pixel
-     *
-     * @throws DatabaseError
-     */
-    public function updatePixel(int $x, int $y, int $color_id, int $user_id): int
-    {
-        return $this->update(
-            "UPDATE 
-                                    pixel 
-                                 SET 
-                                    color_id = ?,
-                                    user_id = ?,
-                                    last_updated = NOW(),
-                                    number_of_times_placed = number_of_times_placed + 1
-                                 WHERE x_position = ? AND y_position = ?",
-            ["iiii", $color_id, $user_id, $x, $y]
-        );
-    }
-
-    /**
-     * delete a pixel
-     *
-     * @param int $msgId The id of the pixel to delete
-     * @return int the id of the deleted user
-     * @throws Exception If the pixel doesn't exist
-     */
-    public function deletePixel(int $pixelId): int
-    {
-        return $this->delete("DELETE FROM pixel WHERE id = ?", ["i", $pixelId]);
-    }
-
-    /**
-     * Create a new pixel
-     * @param int $x The x position of the pixel
-     * @param int $y The y position of the pixel
-     * @param int $color_id The color of the pixel
-     * @param int $user_id The user who placed the pixel
-     * @return int The id of the pixel
-     * @throws DatabaseError
-     * @throws PixelAlreadyExistException
-     */
-    public function createPixel(int $x, int $y, int $color_id, int $user_id): int
-    {
-        // check if the pixel already exists
-        $pixel = $this->select("SELECT * FROM pixel WHERE x_position = ? AND y_position = ?", ["ii", $x, $y]);
-        if (count($pixel) > 0) {
-            throw new PixelAlreadyExistException("Pixel already exists");
-        }
-        return $this->insert("INSERT INTO 
-                                            pixel 
-                                                (x_position,
-                                                 y_position,
-                                                 color_id,
-                                                 user_id,
-                                                 last_updated,
-                                                 number_of_times_placed) 
-                                            VALUES (?, ?, ?, ?, NOW(), 1)", ["iiii", $x, $y, $color_id, $user_id]);
-    }
-
-    /**
-     * Get all pixels in a rectangle and return a 2D array of the pixels
-     *
-     *
-     * @param int $x1 The x position of the top left corner
-     * @param int $y1 The y position of the top left corner
-     * @param int $x2 The x position of the bottom right corner
-     * @param int $y2 The y position of the bottom right corner
-     * @return array
-     * @throws DatabaseError
-     */
-    public function getPixelsInRectangleAsArray(int $x1, int $y1, int $x2, int $y2): array
-    {
-        $pixels = $this->getPixelsInRectangle($x1, $y1, $x2, $y2);
-        $pixelsArray = [];
-        foreach ($pixels as $pixel) {
-            $pixelsArray[$pixel["x_position"]][$pixel["y_position"]] = $pixel;
-        }
-        // convert the array to a 2D array
-        $pixelsArray = array_map(function ($row) {
-            return array_values($row);
-        }, $pixelsArray);
-        $finalArray = [];
-        foreach ($pixelsArray as $row) {
-            $finalArray[] = array_values($row);
-        }
-        return $finalArray;
-    }
-
-
-    public function makeUserIdNull(int $pixelId): int
-    {
-        return $this->update("UPDATE pixel SET user_id = null WHERE id = ?", ["i", $pixelId]);
-    }
-
-    public function getPixelsByUserId(int $userId): array
-    {
-        return $this->select("SELECT * FROM pixel WHERE user_id = ?", ["i", $userId]);
-    }
-
-    public function getPixels(int $limit): array
-    {
-        return $this->select("SELECT * FROM pixel ORDER BY id LIMIT ?", ["i", $limit]);
     }
 }

@@ -211,8 +211,8 @@
             try {
                 $this->isRequestMethodOrThrow('PUT');
                 $chatRoomModel = new chatRoomModel();
-                $queryArgs = self::getRequiredPutArgsOrThrow(array('chatRoomId', 'userId'), array('number', 'number'));
-                $arrChatRooms = $chatRoomModel->updateUsers($queryArgs['chatRoomId'], $queryArgs['userId']);
+                $queryArgs = self::getRequiredPutArgsOrThrow(array('chatRoomId', 'usersId'), array('number', 'number'));
+                $arrChatRooms = $chatRoomModel->updateUsers($queryArgs['chatRoomId'], $queryArgs['usersId']);
                 $responseData = json_encode($arrChatRooms);
 
             } catch (Exception $e) {
